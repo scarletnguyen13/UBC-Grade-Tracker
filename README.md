@@ -13,6 +13,7 @@ assignments.
 
 ## User Story
 
-- I want to get my grades and courses from SSC automatically
-- I want to add components and grade distribution in the courses
-- I want to visualize the grade distribution for each course
+- As a user, I want to store my UBC-related information
+- As a user, I want to be able to add sessions/terms/courses to my profile
+- As a user, I want to access my information using the command line
+- As a user, I want to edit my information using the command line
