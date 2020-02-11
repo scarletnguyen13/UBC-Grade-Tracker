@@ -1,5 +1,6 @@
 package model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -12,13 +13,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SessionTest {
     private Session session;
+    private Set<Term> terms;
+
+    @BeforeEach
+    void runBefore() {
+        terms = new HashSet<>();
+        terms.add(new Term("Term 1"));
+        terms.add(new Term("Term 2"));
+    }
 
     @Test
     void testInit1() {
-        Set<Term> terms = new HashSet<>();
-        terms.add(new Term("Term 1"));
-        terms.add(new Term("Term 2"));
-
         session = new Session(2013, SessionType.WINTER_SESSION, terms);
 
         assertEquals(2013, session.getYear());
@@ -33,6 +38,19 @@ public class SessionTest {
         assertEquals(2019, session.getYear());
         assertEquals(SessionType.SUMMER_SESSION, session.getType());
         assertEquals(0, session.getTerms().size());
+    }
+
+    @Test
+    void testSetters() {
+        session = new Session(2019, SessionType.SUMMER_SESSION);
+
+        session.setYear(2014);
+        session.setType(SessionType.WINTER_SESSION);
+        session.setTerms(terms);
+
+        assertEquals(2014, session.getYear());
+        assertEquals(SessionType.WINTER_SESSION, session.getType());
+        assertEquals(terms, session.getTerms());
     }
 
     @Test

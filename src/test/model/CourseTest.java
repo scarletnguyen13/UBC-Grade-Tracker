@@ -56,6 +56,24 @@ public class CourseTest {
     }
 
     @Test
+    void testSetters() {
+        course = new Course("CPSC121", "L56");
+
+        assertEquals("CPSC121", course.getName());
+        assertEquals("L56", course.getSection());
+
+        course.setName("CPSC210");
+        course.setSection("L46");
+        course.setInstructor(new Instructor("VandePol"));
+        course.setComponents(courseComponents);
+
+        assertEquals("CPSC210", course.getName());
+        assertEquals("L46", course.getSection());
+        assertEquals(new Instructor("VandePol"), course.getInstructor());
+        assertEquals(courseComponents, course.getComponents());
+    }
+
+    @Test
     void testToString() {
         course = new Course("CPSC210", "L13");
         assertEquals("CPSC210", course.toString());

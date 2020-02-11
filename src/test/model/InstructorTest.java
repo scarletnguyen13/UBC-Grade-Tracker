@@ -52,11 +52,23 @@ public class InstructorTest {
     @Test
     void testEquals() {
         instructor = new Instructor("Dirk");
+        assertTrue(instructor.equals(instructor));
         assertTrue(instructor.equals(new Instructor("Dirk")));
 
         instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
+        assertFalse(instructor.equals(new Term("Term")));
         assertFalse(instructor.equals(new Instructor("Dirk")));
         assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
+    }
 
+    @Test
+    void testSetters() {
+        instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
+
+        instructor.setName("Scarlet");
+        instructor.setEmail("scarlet.nguyen01@gmail.com");
+
+        assertEquals("Scarlet", instructor.getName());
+        assertEquals("scarlet.nguyen01@gmail.com", instructor.getEmail());
     }
 }

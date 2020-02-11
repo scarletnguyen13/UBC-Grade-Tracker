@@ -22,4 +22,18 @@ public class CourseComponentTest {
         assertEquals("Quizzes", courseComponent.getName());
         assertEquals(40, courseComponent.getPercentage());
     }
+
+    @Test
+    void testSetters() {
+        courseComponent.setName("Homework");
+        courseComponent.setPercentage(20);
+
+        assertEquals("Homework", courseComponent.getName());
+        assertEquals(20, courseComponent.getPercentage());
+    }
+
+    @Test
+    void testToString() {
+        assertEquals("Quizzes 40%", courseComponent.toString());
+    }
 }

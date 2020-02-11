@@ -14,21 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TermTest {
     private static final String TERM_NAME = "Term";
     private Term term;
+    private Set<Course> courses;
 
     @BeforeEach
     void runBefore() {
-        term = new Term(TERM_NAME);
-    }
-
-    @Test
-    void testInit1() {
-        Set<Course> courses = new HashSet<>();
+        courses = new HashSet<>();
         courses.add(new Course("CPSC121"));
         courses.add(new Course("CPSC210"));
         courses.add(new Course("MATH101"));
         courses.add(new Course("DSCI100"));
 
+        term = new Term(TERM_NAME);
+    }
 
+    @Test
+    void testInit1() {
         term = new Term(TERM_NAME, courses);
 
         assertEquals(TERM_NAME, term.getName());
@@ -39,6 +39,15 @@ public class TermTest {
     void testInit2() {
         assertEquals(TERM_NAME, term.getName());
         assertTrue(term.getCourses().isEmpty());
+    }
+
+    @Test
+    void testSetters() {
+        term.setName("Term 1");
+        term.setCourses(courses);
+
+        assertEquals("Term 1", term.getName());
+        assertEquals(courses, term.getCourses());
     }
 
     @Test
@@ -80,5 +89,22 @@ public class TermTest {
         assertEquals(1, term.getCourses().size());
         assertTrue(term.getCourses().contains(cpsc121));
         assertFalse(term.getCourses().contains(cpsc210));
+    }
+
+    @Test
+    void testToString() {
+        String result = term.getName() + " [" + term.getCourses() + "]";
+        assertEquals(result, term.toString());
+    }
+
+    @Test
+    void testEquals() {
+        term = new Term(TERM_NAME, courses);
+
+        assertTrue(term.equals(term));
+        assertFalse(term.equals(new Instructor()));
+        assertFalse(term.equals(new Term(TERM_NAME)));
+        assertTrue(term.equals(new Term(TERM_NAME, courses)));
+        assertFalse(term.equals(new Term("Term 1", courses)));
     }
 }

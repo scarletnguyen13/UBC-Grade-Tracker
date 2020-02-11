@@ -102,8 +102,8 @@ public class Student {
     // MODIFIES: this
     // EFFECTS: replaces the updated course with the existing course
     public void editCourse(Course updatedCourse) {
-        Term oldTerm = new Term("");
-        Term newTerm = new Term("");
+        Term oldTerm = null;
+        Term newTerm = null;
 
         Session oldSession = null;
         Session newSession = null;
@@ -118,13 +118,12 @@ public class Student {
 
                 for (Course course : getAllCourses()) {
                     if (course.equals(updatedCourse)) {
+                        newTerm.removeCourse(course);
                         newTerm.addCourse(updatedCourse);
                     }
-                    oldTerm.addCourse(course);
                 }
             }
         }
-
         newSession.removeTerm(oldTerm);
         newSession.addTerm(newTerm);
 
@@ -132,7 +131,7 @@ public class Student {
         this.sessions.add(newSession);
     }
 
-    public Course findCourse(String name) {
+    public Course findCourseByName(String name) {
         Course course = null;
         for (Course c: this.getAllCourses()) {
             if (c.getName().equals(name)) {
@@ -144,14 +143,6 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Student{"
-                + "name='" + name + "\'\n"
-                + ", studentId=" + studentId + "\'\n"
-                + ", csId='" + csId + "\'\n"
-                + ", email='" + email + "\'\n"
-                + ", phone='" + phone + "\'\n"
-                + ", gpa=" + gpa + "\'\n"
-                + ", sessions=" + sessions + "\'\n"
-                + '}';
+        return name;
     }
 }

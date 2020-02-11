@@ -55,10 +55,7 @@ public class Term {
 
     @Override
     public String toString() {
-        return "Term{"
-                + "name='" + name + "\'\n"
-                + ", courses=" + courses + "\'\n"
-                + '}';
+        return name + " [" + courses + "]";
     }
 
     @Override

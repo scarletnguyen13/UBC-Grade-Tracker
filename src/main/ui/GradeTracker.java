@@ -161,7 +161,7 @@ public class GradeTracker {
                 System.out.println(student.getStudentId());
                 break;
             case "--course":
-                Course course = student.findCourse(cmd2);
+                Course course = student.findCourseByName(cmd2);
                 if (course == null) {
                     System.out.println("Course not found!");
                     break;
