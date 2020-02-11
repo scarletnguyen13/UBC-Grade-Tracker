@@ -45,7 +45,10 @@ public class InstructorTest {
         instructor = new Instructor();
         assertTrue(instructor.isEmpty());
 
-        instructor = new Instructor("Dirk");
+        instructor = new Instructor("Dirk", "");
+        assertFalse(instructor.isEmpty());
+
+        instructor = new Instructor("", "dirl@gmail.com");
         assertFalse(instructor.isEmpty());
     }
 
@@ -54,8 +57,12 @@ public class InstructorTest {
         instructor = new Instructor("Dirk");
         assertTrue(instructor.equals(instructor));
         assertTrue(instructor.equals(new Instructor("Dirk")));
+        assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
 
         instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
+        assertTrue(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.com")));
+
+        assertFalse(instructor.equals(null));
         assertFalse(instructor.equals(new Term("Term")));
         assertFalse(instructor.equals(new Instructor("Dirk")));
         assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));

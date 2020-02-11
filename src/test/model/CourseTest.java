@@ -84,8 +84,10 @@ public class CourseTest {
         course = new Course("CPSC210", "L13");
 
         assertTrue(course.equals(course));
-        assertFalse(course.equals(new Instructor("Dirk")));
         assertTrue(course.equals(new Course("CPSC210", "L53")));
+
+        assertFalse(course.equals(new Instructor("Dirk")));
+        assertFalse(course.equals(null));
         assertFalse(course.equals(new Course("ECON110", "L53")));
     }
 }
