@@ -1,6 +1,5 @@
 package model;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,11 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class InstructorTest {
     private Instructor instructor;
-
-    @BeforeEach
-    void runBefore() {
-
-    }
 
     @Test
     void testInit1() {
@@ -53,22 +47,6 @@ public class InstructorTest {
     }
 
     @Test
-    void testEquals() {
-        instructor = new Instructor("Dirk");
-        assertTrue(instructor.equals(instructor));
-        assertTrue(instructor.equals(new Instructor("Dirk")));
-        assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
-
-        instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
-        assertTrue(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.com")));
-
-        assertFalse(instructor.equals(null));
-        assertFalse(instructor.equals(new Term("Term")));
-        assertFalse(instructor.equals(new Instructor("Dirk")));
-        assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
-    }
-
-    @Test
     void testSetters() {
         instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
 
@@ -77,5 +55,18 @@ public class InstructorTest {
 
         assertEquals("Scarlet", instructor.getName());
         assertEquals("scarlet.nguyen01@gmail.com", instructor.getEmail());
+    }
+
+    @Test
+    void testEquals() {
+        instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
+
+        assertTrue(instructor.equals(instructor));
+        assertTrue(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.com")));
+
+        assertFalse(instructor.equals(new Term("Term")));
+        assertFalse(instructor.equals(new Term("Dirk")));
+        assertFalse(instructor.equals(null));
+        assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
     }
 }
