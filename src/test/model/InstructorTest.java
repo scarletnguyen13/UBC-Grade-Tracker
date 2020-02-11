@@ -65,7 +65,8 @@ public class InstructorTest {
         assertTrue(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.com")));
 
         assertFalse(instructor.equals(new Term("Term")));
-        assertFalse(instructor.equals(new Term("Dirk")));
+        assertFalse(instructor.equals(new Instructor("Dirk")));
+        assertFalse(instructor.equals(new Instructor("", "dirkvandepol@gmail.com")));
         assertFalse(instructor.equals(null));
         assertFalse(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.ca")));
     }
