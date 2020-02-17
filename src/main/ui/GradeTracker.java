@@ -1,19 +1,36 @@
 package ui;
 
 import model.*;
+import persistance.FileHandler;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GradeTracker {
+    private static final String MAIN_CMD = "tracker";
+    private static final String NAME_CMD = "--name";
+    private static final String ID_CMD = "--studentId";
+    private static final String COURSE_CMD = "--course";
+    private static final String COURSES_CMD = "--courses";
+    private static final String COMPONENTS_CMD = "--components";
+    private static final String SAVE_CMD = "--save";
+
     Student student;
     Scanner scanner;
+    FileHandler fileHandler;
 
     // Initialize the Grade Tracker console application
     public GradeTracker() {
         scanner = new Scanner(System.in);
-        takeStudentInfo();
+        fileHandler = new FileHandler();
+        try {
+            this.student = this.fileHandler.read();
+            handleCommand();
+        } catch (IOException | ClassNotFoundException e) {
+            takeStudentInfo();
+        }
     }
 
     // Get student's basic information
@@ -53,10 +70,9 @@ public class GradeTracker {
         Session currentSession = new Session(
                 year,
                 sessionInfo[1].equalsIgnoreCase("S")
-                        ?
-                        SessionType.SUMMER_SESSION
-                        :
-                        SessionType.WINTER_SESSION);
+                        ? SessionType.SUMMER_SESSION
+                        : SessionType.WINTER_SESSION
+        );
 
 
         return currentSession;
@@ -106,17 +122,55 @@ public class GradeTracker {
     // Print response based on the given command
     private void printCommandResponse(String cmd) {
         List<String> cmdList = convertCommandInput(cmd);
-        switch (cmdList.size()) {
-            case 1: {
-                System.out.println("Welcome to UBC Grade Tracker!");
+        if (cmdList.get(0).equals(MAIN_CMD)) {
+            switch (cmdList.size()) {
+                case 1: {
+                    printWelcome();
+                    break;
+                }
+                case 2: {
+                    handleOneCommand(cmdList.get(1));
+                    break;
+                }
+                case 3: {
+                    handleTwoCommand(cmdList.get(1), cmdList.get(2));
+                    break;
+                }
+                default: {
+                    printWarning();
+                    break;
+                }
+            }
+        } else {
+            printWarning();
+        }
+    }
+
+    private void printWelcome() {
+        System.out.println("Welcome to UBC Grade Tracker!");
+    }
+
+    private void printWarning() {
+        System.out.println("Wrong command!");
+    }
+
+    // Print the student's requested info
+    private void handleOneCommand(String cmd) {
+        switch (cmd) {
+            case NAME_CMD: {
+                System.out.println(student.getName());
                 break;
             }
-            case 2: {
-                handleOneCommand(cmdList.get(1));
+            case ID_CMD: {
+                System.out.println(student.getStudentId());
                 break;
             }
-            case 3: {
-                handleTwoCommand(cmdList.get(1), cmdList.get(2));
+            case COURSES_CMD: {
+                System.out.println(student.getAllCourses());
+                break;
+            }
+            case SAVE_CMD: {
+                saveData();
                 break;
             }
             default: {
@@ -126,41 +180,23 @@ public class GradeTracker {
         }
     }
 
-    // Print the student's requested info
-    private void handleOneCommand(String cmd) {
-        switch (cmd) {
-            case "--name": {
-                System.out.println(student.getName());
-                break;
-            }
-            case "--studentId": {
-                System.out.println(student.getStudentId());
-                break;
-            }
-            case "--courses": {
-                System.out.println(student.getAllCourses());
-                break;
-            }
-            default: {
-                System.out.println("Wrong command!");
-                break;
-            }
-        }
+    private void saveData() {
+        this.fileHandler.write(this.student);
     }
 
     // MODIFIES: this
     // EFFECTS: updates and modifies the student's info based on the requested information
     private void handleTwoCommand(String cmd1, String cmd2) {
         switch (cmd1) {
-            case "--name":
+            case NAME_CMD:
                 this.student.setName(cmd2);
                 System.out.println(student.getName());
                 break;
-            case "--studentId":
+            case ID_CMD:
                 this.student.setStudentId(cmd2);
                 System.out.println(student.getStudentId());
                 break;
-            case "--course":
+            case COURSE_CMD:
                 Course course = student.findCourseByName(cmd2);
                 if (course == null) {
                     System.out.println("Course not found!");
@@ -212,7 +248,7 @@ public class GradeTracker {
     // Print the course's requested info
     private void handleCourseOneCommand(Course course, String cmd1) {
         switch (cmd1) {
-            case "--components": {
+            case COMPONENTS_CMD: {
                 System.out.println(course.getComponents());
             }
         }
@@ -222,7 +258,7 @@ public class GradeTracker {
     // EFFECTS: updates and modifies the course's info based on the requested information
     private void handleCourseTwoCommand(Course course, String cmd1, String cmd2) {
         switch (cmd1) {
-            case "--components": {
+            case COMPONENTS_CMD: {
                 String[] componentsSplit = cmd2.split(", ");
                 Set<CourseComponent> courseComponents = new HashSet<>();
 

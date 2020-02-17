@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.util.*;
 
-/*
+/**
  * Represents a course's instructor/professor.
  */
-public class Instructor {
+public class Instructor implements Serializable {
     private String name;
     private String email;
 

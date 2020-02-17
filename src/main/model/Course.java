@@ -1,13 +1,14 @@
 package model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/*
+/**
  * Represents a UBC Course.
  */
-public class Course {
+public class Course implements Serializable {
     private String name;
     private String section;
     private Instructor instructor;

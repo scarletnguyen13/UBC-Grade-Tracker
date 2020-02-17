@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
+/**
  * Unit tests for the Student class.
  */
 class StudentTest {
@@ -136,6 +136,9 @@ class StudentTest {
 
     @Test
     void testToString() {
-        assertEquals("Scarlet Nguyen", student.toString());
+        String expectedResult =   "Name: " + this.student.getName() + "\n"
+                                + "Student ID: " + this.student.getStudentId() + "\n"
+                                + "Sessions: " + this.sessions + "\n";
+        assertEquals(expectedResult, student.toString());
     }
 }

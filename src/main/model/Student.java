@@ -1,12 +1,13 @@
 package model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-/*
+/**
  * Represents a UBC student - also the main user of the app.
  */
-public class Student {
+public class Student implements Serializable {
     private String name;
     private String studentId;
     private String csId;
@@ -143,6 +144,8 @@ public class Student {
 
     @Override
     public String toString() {
-        return name;
+        return "Name: " + this.name + "\n"
+                + "Student ID: " + this.studentId + "\n"
+                + "Sessions: " + this.sessions + "\n";
     }
 }

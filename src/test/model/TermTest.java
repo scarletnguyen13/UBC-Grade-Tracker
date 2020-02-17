@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
+/**
  * Unit tests for the Term class.
  */
 public class TermTest {

@@ -17,3 +17,7 @@ assignments.
 - As a user, I want to be able to add sessions/terms/courses to my profile
 - As a user, I want to access my information using the command line
 - As a user, I want to edit my information using the command line
+
+- As a user, I want to be able to save my student information to file
+- As a user, I want to be able to optionally load my my student information 
+ from file when the program starts

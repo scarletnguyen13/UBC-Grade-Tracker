@@ -1,13 +1,13 @@
 package model;
 
+import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
-/*
+/**
  * Represents a UBC session such as 2018S, 2019W, etc.
  */
-public class Session {
+public class Session implements Serializable {
     private int year;
     private SessionType type;
     private Set<Term> terms;

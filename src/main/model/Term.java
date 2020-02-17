@@ -1,13 +1,14 @@
 package model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/*
+/**
  * Represents a UBC term.
  */
-public class Term {
+public class Term implements Serializable {
     private String name;
     private Set<Course> courses;
 
@@ -21,7 +22,7 @@ public class Term {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {

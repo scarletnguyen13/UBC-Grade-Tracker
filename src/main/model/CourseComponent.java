@@ -1,9 +1,11 @@
 package model;
 
-/*
+import java.io.Serializable;
+
+/**
  * Represents a course's components such as homework, quizzes, etc.
  */
-public class CourseComponent {
+public class CourseComponent implements Serializable {
     private String name;
     private int percentage;
 
