@@ -4,10 +4,13 @@ import model.Student;
 
 import java.io.*;
 
+/**
+ * Handle reading and writing storage files
+ */
 public class FileHandler {
     private static final String FILE_PATH = "./data/student.txt";
     private String path;
-
+    
     public FileHandler(String path) {
         this.path = path;
     }
@@ -21,6 +24,7 @@ public class FileHandler {
         FileOutputStream file = new FileOutputStream(new File(this.path));
         ObjectOutputStream obj = new ObjectOutputStream(file);
 
+        // Write objects
         obj.writeObject(student);
 
         obj.close();
