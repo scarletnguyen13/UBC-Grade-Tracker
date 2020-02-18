@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -61,5 +62,24 @@ public class Session implements Serializable {
     // EFFECTS:  returns an instance of this session
     public Session copy() {
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Session session = (Session) o;
+        return year == session.year
+                && type == session.type
+                && Objects.equals(terms, session.terms);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(year, type, terms);
     }
 }

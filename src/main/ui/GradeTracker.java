@@ -181,7 +181,11 @@ public class GradeTracker {
     }
 
     private void saveData() {
-        this.fileHandler.write(this.student);
+        try {
+            this.fileHandler.write(this.student);
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+        }
     }
 
     // MODIFIES: this

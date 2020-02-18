@@ -95,4 +95,16 @@ public class SessionTest {
         assertTrue(session.getTerms().contains(term1));
         assertFalse(session.getTerms().contains(term2));
     }
+
+    @Test
+    void testEquals() {
+        session = new Session(2013, SessionType.WINTER_SESSION, terms);
+
+        assertTrue(session.equals(session));
+        assertFalse(session.equals(new Term("Term 1")));
+        assertTrue(session.equals(new Session(2013, SessionType.WINTER_SESSION, terms)));
+        assertFalse(session.equals(new Session(2012, SessionType.WINTER_SESSION, terms)));
+        assertFalse(session.equals(new Session(2013, SessionType.SUMMER_SESSION, terms)));
+        assertFalse(session.equals(new Session(2013, SessionType.WINTER_SESSION, new HashSet<>())));
+    }
 }

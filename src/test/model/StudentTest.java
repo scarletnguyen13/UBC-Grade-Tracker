@@ -15,10 +15,10 @@ class StudentTest {
     private Student student;
     private Set<Session> sessions;
 
-    Set<Course> term1Courses;
-    Set<Course> term2Courses;
+    private Set<Course> term1Courses;
+    private Set<Course> term2Courses;
 
-    Set<Course> summerCourses;
+    private Set<Course> summerCourses;
 
     @BeforeEach
     void runBefore() {

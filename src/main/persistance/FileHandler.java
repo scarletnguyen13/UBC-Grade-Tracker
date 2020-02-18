@@ -5,32 +5,31 @@ import model.Student;
 import java.io.*;
 
 public class FileHandler {
-    private static final String PATH = "./data/student.txt";
+    private static final String FILE_PATH = "./data/student.txt";
+    private String path;
 
-    private FileOutputStream file;
-    private ObjectOutputStream obj;
-
-    public FileHandler() {}
-
-    public void write(Student student) {
-        try {
-            file = new FileOutputStream(new File(PATH));
-            obj = new ObjectOutputStream(file);
-
-            obj.writeObject(student);
-
-            obj.close();
-            file.close();
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (IOException e) {
-            System.out.println("Error initializing stream");
-        }
+    public FileHandler(String path) {
+        this.path = path;
     }
 
+    public FileHandler() {
+        this(FILE_PATH);
+    }
+
+    // EFFECTS: creates/overwrites a file in data folder that stores the student object
+    public void write(Student student) throws IOException {
+        FileOutputStream file = new FileOutputStream(new File(this.path));
+        ObjectOutputStream obj = new ObjectOutputStream(file);
+
+        obj.writeObject(student);
+
+        obj.close();
+        file.close();
+    }
+
+    // EFFECTS: returns the student object from the file in data folder
     public Student read() throws IOException, ClassNotFoundException {
-        FileInputStream fi = new FileInputStream(new File(PATH));
+        FileInputStream fi = new FileInputStream(new File(this.path));
         ObjectInputStream oi = new ObjectInputStream(fi);
 
         // Read objects
@@ -41,5 +40,9 @@ public class FileHandler {
         fi.close();
 
         return student;
+    }
+
+    public String getPath() {
+        return this.path;
     }
 }
