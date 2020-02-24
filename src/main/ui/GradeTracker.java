@@ -39,12 +39,21 @@ public class GradeTracker {
     public void takeStudentInfo() {
         System.out.print("\nName (*): ");
         String name = scanner.nextLine();
+        while (name == null || name.isEmpty()) {
+            name = scanner.nextLine();
+        }
 
         System.out.print("\nStudent Number (*): ");
         String studentId = scanner.nextLine();
+        while (studentId == null || studentId.isEmpty()) {
+            studentId = scanner.nextLine();
+        }
 
         System.out.print("\nCurrent session year(eg. 2019-W): ");
         String session = scanner.nextLine();
+        while (session == null || !session.contains("-")) {
+            session = scanner.nextLine();
+        }
 
         HashSet<Session> sessions = new HashSet<>();
         Session currentSession = convertSessionInput(session);

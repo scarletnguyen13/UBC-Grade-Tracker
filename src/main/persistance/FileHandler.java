@@ -10,7 +10,7 @@ import java.io.*;
 public class FileHandler {
     private static final String FILE_PATH = "./data/student.txt";
     private String path;
-    
+
     public FileHandler(String path) {
         this.path = path;
     }
