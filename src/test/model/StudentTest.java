@@ -20,6 +20,8 @@ class StudentTest {
 
     private Set<Course> summerCourses;
 
+    private Set<Term> summerTerms;
+
     @BeforeEach
     void runBefore() {
         term1Courses = new HashSet<>();
@@ -49,7 +51,7 @@ class StudentTest {
 
         Term summerTerm = new Term("Summer Term", summerCourses);
 
-        Set<Term> summerTerms = new HashSet<>();
+        summerTerms = new HashSet<>();
         summerTerms.add(summerTerm);
 
         sessions = new HashSet<>();
@@ -64,7 +66,7 @@ class StudentTest {
         student = new Student(
                 "Scarlet Nguyen", "44304491", "d6x2b",
                 "scarlet.nguyen01@gmail.com", "(604) 369-9123",
-                3.8, sessions
+                "3.8", sessions
         );
 
         assertEquals("Scarlet Nguyen", student.getName());
@@ -72,7 +74,7 @@ class StudentTest {
         assertEquals("d6x2b", student.getCsId());
         assertEquals("scarlet.nguyen01@gmail.com", student.getEmail());
         assertEquals("(604) 369-9123", student.getPhone());
-        assertEquals(3.8, student.getGpa());
+        assertEquals("3.8", student.getGpa());
         assertEquals(sessions, student.getSessions());
     }
 
@@ -83,8 +85,20 @@ class StudentTest {
         assertTrue(student.getCsId().isEmpty());
         assertTrue(student.getEmail().isEmpty());
         assertTrue(student.getPhone().isEmpty());
-        assertEquals(0.0, student.getGpa());
+        assertEquals("", student.getGpa());
         assertEquals(sessions, student.getSessions());
+    }
+
+    @Test
+    void testInit3() {
+        this.student = new Student();
+        assertTrue(student.getName().isEmpty());
+        assertTrue(student.getStudentId().isEmpty());
+        assertTrue(student.getCsId().isEmpty());
+        assertTrue(student.getEmail().isEmpty());
+        assertTrue(student.getPhone().isEmpty());
+        assertTrue(student.getGpa().isEmpty());
+        assertEquals(0, student.getSessions().size());
     }
 
     @Test
@@ -96,7 +110,7 @@ class StudentTest {
         student.setCsId("d6x2b");
         student.setEmail("scarlet.nguyen01@gmail.com");
         student.setPhone("(604) 369-9123");
-        student.setGpa(3.8);
+        student.setGpa("3.8");
         student.setSessions(sessions);
 
         assertEquals("Scarlet", student.getName());
@@ -104,7 +118,7 @@ class StudentTest {
         assertEquals("d6x2b", student.getCsId());
         assertEquals("scarlet.nguyen01@gmail.com", student.getEmail());
         assertEquals("(604) 369-9123", student.getPhone());
-        assertEquals(3.8, student.getGpa());
+        assertEquals("3.8", student.getGpa());
         assertEquals(sessions, student.getSessions());
     }
 
@@ -114,24 +128,17 @@ class StudentTest {
     }
 
     @Test
-    void testEditCourse() {
-        Course updatedCourse = new Course("CPSC121", "L26");
-
-        student.editCourse(updatedCourse);
-
-        assertTrue(student.getAllCourses().contains(updatedCourse));
-
-        for (Course course: student.getAllCourses()) {
-            if (updatedCourse.equals(course)) {
-                assertEquals("L26", course.getSection());
-            }
-        }
-    }
-
-    @Test
     void testFindCourseByName() {
         assertEquals(new Course("CPSC121"), student.findCourseByName("CPSC121"));
         assertEquals(null, student.findCourseByName("CPSC400"));
+    }
+
+    @Test void testAddSession() {
+        assertEquals(2, this.student.getSessions().size());
+        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerTerms));
+        assertEquals(3, this.student.getSessions().size());
+        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerTerms));
+        assertEquals(3, this.student.getSessions().size());
     }
 
     @Test

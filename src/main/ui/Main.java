@@ -1,26 +1,22 @@
 package ui;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    private GradeTrackerUI ui;
+
     public static void main(String[] args) {
         launch(args);
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        VBox vbox = new VBox(new Label("A JavaFX Label"));
-        Scene scene = new Scene(vbox);
+        ui = new GradeTrackerUI(primaryStage);
+    }
 
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("JavaFX Stage Window Title");
-        primaryStage.setWidth(500);
-        primaryStage.setHeight(500);
-        primaryStage.show();
+    @Override
+    public void stop() {
+        ui.saveData();
     }
 }

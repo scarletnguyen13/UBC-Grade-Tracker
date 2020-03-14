@@ -49,14 +49,9 @@ public class Term implements Serializable {
         return this.courses;
     }
 
-    // EFFECTS:  returns an instance of this term
-    public Term copy() {
-        return this;
-    }
-
     @Override
     public String toString() {
-        return name + " [" + courses + "]";
+        return name;
     }
 
     @Override

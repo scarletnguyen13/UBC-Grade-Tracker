@@ -1,8 +1,7 @@
 package model;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a UBC student - also the main user of the app.
@@ -14,11 +13,11 @@ public class Student implements Serializable {
     private String email;
     private String phone;
 
-    private Double gpa;
+    private String gpa;
     private Set<Session> sessions;
 
     public Student(String name, String studentId, String csId,
-                   String email, String phone, Double gpa, Set<Session> sessions) {
+                   String email, String phone, String gpa, Set<Session> sessions) {
         this.name = name;
         this.studentId = studentId;
         this.csId = csId;
@@ -29,7 +28,11 @@ public class Student implements Serializable {
     }
 
     public Student(String name, String studentId, Set<Session> sessions) {
-        this(name, studentId, "", "", "", 0.0, sessions);
+        this(name, studentId, "", "", "", "", sessions);
+    }
+
+    public Student() {
+        this("", "", "", "", "", "", new HashSet<Session>());
     }
 
     public void setName(String name) {
@@ -72,11 +75,11 @@ public class Student implements Serializable {
         return phone;
     }
 
-    public void setGpa(Double gpa) {
+    public void setGpa(String gpa) {
         this.gpa = gpa;
     }
 
-    public Double getGpa() {
+    public String getGpa() {
         return gpa;
     }
 
@@ -99,39 +102,7 @@ public class Student implements Serializable {
         return courses;
     }
 
-    // REQUIRES: updated course must exist in the current course list
-    // MODIFIES: this
-    // EFFECTS: replaces the updated course with the existing course
-    public void editCourse(Course updatedCourse) {
-        Term oldTerm = null;
-        Term newTerm = null;
-
-        Session oldSession = null;
-        Session newSession = null;
-
-        for (Session session : this.sessions) {
-            oldSession = session.copy();
-            newSession = session.copy();
-
-            for (Term term : session.getTerms()) {
-                oldTerm = term.copy();
-                newTerm = term.copy();
-
-                for (Course course : getAllCourses()) {
-                    if (course.equals(updatedCourse)) {
-                        newTerm.removeCourse(course);
-                        newTerm.addCourse(updatedCourse);
-                    }
-                }
-            }
-        }
-        newSession.removeTerm(oldTerm);
-        newSession.addTerm(newTerm);
-
-        this.sessions.remove(oldSession);
-        this.sessions.add(newSession);
-    }
-
+    // EFFECTS: returns the course in all courses if exists, null otherwise
     public Course findCourseByName(String name) {
         Course course = null;
         for (Course c: this.getAllCourses()) {
@@ -140,6 +111,12 @@ public class Student implements Serializable {
             }
         }
         return course;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: add the session the the list of sessions
+    public void addSession(Session session) {
+        this.sessions.add(session);
     }
 
     @Override

@@ -38,7 +38,6 @@ public class FileHandler {
 
         // Read objects
         Student student = (Student) oi.readObject();
-        System.out.println(student.toString());
 
         oi.close();
         fi.close();

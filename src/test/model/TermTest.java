@@ -93,7 +93,7 @@ public class TermTest {
 
     @Test
     void testToString() {
-        String result = term.getName() + " [" + term.getCourses() + "]";
+        String result = term.getName();
         assertEquals(result, term.toString());
     }
 

@@ -59,11 +59,6 @@ public class Session implements Serializable {
         this.terms.remove(term);
     }
 
-    // EFFECTS:  returns an instance of this session
-    public Session copy() {
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -81,5 +76,11 @@ public class Session implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(year, type, terms);
+    }
+
+    @Override
+    public String toString() {
+        String type = this.type == SessionType.SUMMER_SESSION ? "S" : "W";
+        return year + "" + type;
     }
 }
