@@ -20,6 +20,23 @@ public class GradeTrackerUI {
     private Student student;
     private FileHandler fileHandler;
 
+    private TextField nameTextField;
+    private TextField studentIdTextField;
+    private TextField csIdTextField;
+    private TextField emailTextField;
+    private TextField phoneTextField;
+    private TextField gpaTextField;
+
+    private ComboBox yearComboBox;
+    private ComboBox sessionComboBox;
+    private ComboBox termComboBox;
+    private VBox courseTextFieldContainer;
+
+    private TextField sectionInput;
+    private TextField instructorNameInput;
+    private TextField instructorEmailInput;
+    private VBox courseComponentContainer;
+
     public GradeTrackerUI(Stage primaryStage) {
         this.primaryStage = primaryStage;
         fileHandler = new FileHandler();
@@ -45,23 +62,7 @@ public class GradeTrackerUI {
         ListView list = new ListView();
         VBox.setVgrow(list, Priority.ALWAYS);
 
-        TextField nameTextField = new TextField();
-        nameTextField.setText(this.student.getName());
-
-        TextField studentIdTextField = new TextField();
-        studentIdTextField.setText(this.student.getStudentId());
-
-        TextField csIdTextField = new TextField();
-        csIdTextField.setText(this.student.getCsId());
-
-        TextField emailTextField = new TextField();
-        emailTextField.setText(this.student.getEmail());
-
-        TextField phoneTextField = new TextField();
-        phoneTextField.setText(this.student.getPhone());
-
-        TextField gpaTextField = new TextField();
-        gpaTextField.setText(this.student.getGpa());
+        this.initInfoTextFields();
 
         VBox nameBox = createInputField("Name");
         nameBox.getChildren().add(nameTextField);
@@ -81,8 +82,18 @@ public class GradeTrackerUI {
         VBox gpaBox = createInputField("GPA");
         gpaBox.getChildren().add(gpaTextField);
 
-        Button toSessionSceneButton = new Button("Done");
-        toSessionSceneButton.setOnAction(e -> {
+        Button toSessionSceneButton = createInfoSubmitButton(nextScene);
+
+        vbox.getChildren().addAll(nameBox, studentIdBox, csIdBox, emailBox, phoneBox, gpaBox, toSessionSceneButton);
+        vbox.setSpacing(20);
+        vbox.setPadding(new Insets(20));
+
+        return new Scene(vbox);
+    }
+
+    private Button createInfoSubmitButton(Scene nextScene) {
+        Button button = new Button("Done");
+        button.setOnAction(e -> {
             this.student.setName(nameTextField.getText());
             this.student.setStudentId(studentIdTextField.getText());
             this.student.setCsId(csIdTextField.getText());
@@ -93,11 +104,27 @@ public class GradeTrackerUI {
             this.primaryStage.setScene(nextScene == null ? createDashboardScene() : nextScene);
         });
 
-        vbox.getChildren().addAll(nameBox, studentIdBox, csIdBox, emailBox, phoneBox, gpaBox, toSessionSceneButton);
-        vbox.setSpacing(20);
-        vbox.setPadding(new Insets(20));
+        return button;
+    }
 
-        return new Scene(vbox);
+    private void initInfoTextFields() {
+        nameTextField = new TextField();
+        nameTextField.setText(this.student.getName());
+
+        studentIdTextField = new TextField();
+        studentIdTextField.setText(this.student.getStudentId());
+
+        csIdTextField = new TextField();
+        csIdTextField.setText(this.student.getCsId());
+
+        emailTextField = new TextField();
+        emailTextField.setText(this.student.getEmail());
+
+        phoneTextField = new TextField();
+        phoneTextField.setText(this.student.getPhone());
+
+        gpaTextField = new TextField();
+        gpaTextField.setText(this.student.getGpa());
     }
 
     private Scene createSessionScene() {
@@ -105,37 +132,44 @@ public class GradeTrackerUI {
         ListView list = new ListView();
         VBox.setVgrow(list, Priority.ALWAYS);
 
-        final ComboBox yearComboBox = createYearComboBox();
-        final ComboBox sessionComboBox = createGeneralComboBox(new String[]{"Winter", "Summer"});
-        final ComboBox termComboBox = createGeneralComboBox(new String[]{"Term 1", "Term 2"});
-
-        HBox optionContainer = new HBox(yearComboBox, sessionComboBox, termComboBox);
-        optionContainer.setSpacing(29);
-
         Label addCourseLabel = new Label("Courses: ");
-        VBox coursesContainer = createTextFieldsContainer();
+        courseTextFieldContainer = createTextFieldsContainer();
 
-        Button addCourseButton = new Button("Add more Course");
-        addCourseButton.setOnAction(e -> {
-            coursesContainer.getChildren().add(new TextField());
-        });
-
-        Button toDashboardButton = new Button("Go to Dashboard");
+        Button addCourseButton = createAddCourseButton();
+        Button toDashboardButton = createSessionSubmitButton();
 
         HBox buttonContainer = new HBox(addCourseButton, toDashboardButton);
         buttonContainer.setSpacing(30);
 
         vbox.getChildren().addAll(
-                optionContainer,
+                this.createComboBoxContainter(),
                 addCourseLabel,
-                coursesContainer,
+                this.courseTextFieldContainer,
                 buttonContainer
         );
 
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
 
-        toDashboardButton.setOnAction(e -> {
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+
+        return new Scene(scrollPane);
+    }
+
+    private Button createAddCourseButton() {
+        Button addCourseButton = new Button("Add more Course");
+        addCourseButton.setOnAction(e -> {
+            courseTextFieldContainer.getChildren().add(new TextField());
+        });
+        return addCourseButton;
+    }
+
+    private Button createSessionSubmitButton() {
+        Button submitButton = new Button("Done");
+
+        submitButton.setOnAction(e -> {
             Term term = new Term(termComboBox.getValue().toString());
             SessionType type = sessionComboBox.getValue().toString().equals("Summer") ? SessionType.SUMMER_SESSION
                     : SessionType.WINTER_SESSION;
@@ -143,7 +177,7 @@ public class GradeTrackerUI {
             Session currentSession = new Session(Integer.parseInt(yearComboBox.getValue().toString()), type);
 
             Set<Course> courses = new HashSet<>();
-            for (Node node : coursesContainer.getChildren()) {
+            for (Node node : courseTextFieldContainer.getChildren()) {
                 String courseName = ((TextField)node).getText();
                 if (!courseName.isEmpty()) {
                     courses.add(new Course(courseName, initEmptyList(), term, currentSession));
@@ -157,12 +191,18 @@ public class GradeTrackerUI {
 
             this.primaryStage.setScene(createDashboardScene());
         });
+        return submitButton;
+    }
 
-        ScrollPane scrollPane = new ScrollPane(vbox);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
+    private HBox createComboBoxContainter() {
+        yearComboBox = createYearComboBox();
+        sessionComboBox = createGeneralComboBox(new String[]{"Winter", "Summer"});
+        termComboBox = createGeneralComboBox(new String[]{"Term 1", "Term 2"});
 
-        return new Scene(scrollPane);
+        HBox container = new HBox(yearComboBox, sessionComboBox, termComboBox);
+        container.setSpacing(29);
+
+        return container;
     }
 
     private VBox createTextFieldsContainer() {
@@ -200,38 +240,36 @@ public class GradeTrackerUI {
     }
 
     private Scene createDashboardScene() {
-        Label nameLabel = new Label("Name: " + this.student.getName());
-        Label studentIdLabel = new Label("Student ID: " + this.student.getStudentId());
-        Label csIdLabel = new Label("CS ID: " + this.student.getCsId());
-        Label emailLabel = new Label("Email: " + this.student.getEmail());
-        Label phoneLabel = new Label("Phone: " + this.student.getPhone());
-        Label gpaLabel = new Label("GPA: " + this.student.getGpa());
+        SplitPane pane = new SplitPane();
+        pane.getItems().addAll(createInfoDisplay(), createCourseList());
 
-        Button editInfoButton = new Button("Edit Info");
-        editInfoButton.setOnAction(e -> {
-            this.primaryStage.setScene(createInfoScene(null));
-        });
+        return new Scene(pane);
+    }
 
-        Button addSessionButton = new Button("Add Session");
-        addSessionButton.setOnAction(e -> {
-            this.primaryStage.setScene(createSessionScene());
-        });
-
-        HBox hbox = new HBox(editInfoButton, addSessionButton);
-        hbox.setSpacing(30);
-
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel, hbox
-        );
-
-        Label coursesLabel = new Label("Courses: ");
-
+    private TableView createCourseList() {
         TableView tableView = new TableView();
+        for (Course course : this.student.getAllCourses()) {
+            tableView.getItems().add(course);
+        }
+        this.initProps(tableView);
 
+        tableView.setRowFactory(tv -> {
+            TableRow<Course> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty())) {
+                    Course course = row.getItem();
+                    this.primaryStage.setScene(createCourseInfoScene(course));
+                }
+            });
+            return row;
+        });
+
+        return tableView;
+    }
+
+    private void initProps(TableView tableView) {
         TableColumn<String, Course> column1 = new TableColumn<>("Course");
         column1.setCellValueFactory(new PropertyValueFactory<>("name"));
-
 
         TableColumn<String, Session> column2 = new TableColumn<>("Session");
         column2.setCellValueFactory(new PropertyValueFactory<>("session"));
@@ -248,52 +286,53 @@ public class GradeTrackerUI {
         column2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.33));
         column3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.33));
 
-        for (Course course : this.student.getAllCourses()) {
-            tableView.getItems().add(course);
-        }
-
         tableView.setEditable(true);
         tableView.setPrefWidth(150);
 
         tableView.getSortOrder().add(column2);
         tableView.getSortOrder().add(column3);
+        tableView.getSortOrder().add(column1);
         tableView.sort();
+    }
 
-        tableView.setRowFactory(tv -> {
-            TableRow<Course> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty())) {
-                    Course course = row.getItem();
-                    this.primaryStage.setScene(createCourseInfoScene(course));
-                }
-            });
-            return row;
+    private VBox createInfoDisplay() {
+        Button editInfoButton = new Button("Edit Info");
+        editInfoButton.setOnAction(e -> {
+            this.primaryStage.setScene(createInfoScene(null));
         });
+
+        Button addSessionButton = new Button("Add Session");
+        addSessionButton.setOnAction(e -> {
+            this.primaryStage.setScene(createSessionScene());
+        });
+
+        HBox hbox = new HBox(editInfoButton, addSessionButton);
+        hbox.setSpacing(30);
+
+        Label nameLabel = new Label("Name: " + this.student.getName());
+        Label studentIdLabel = new Label("Student ID: " + this.student.getStudentId());
+        Label csIdLabel = new Label("CS ID: " + this.student.getCsId());
+        Label emailLabel = new Label("Email: " + this.student.getEmail());
+        Label phoneLabel = new Label("Phone: " + this.student.getPhone());
+        Label gpaLabel = new Label("GPA: " + this.student.getGpa());
+
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(
+                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel, hbox
+        );
 
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
 
-        SplitPane pane = new SplitPane();
-        pane.getItems().addAll(vbox, tableView);
-
-        return new Scene(pane);
+        return vbox;
     }
 
-    private Scene createCourseInfoScene(Course course) {
-        Label courseLabel = new Label(course.getName());
-        courseLabel.setFont(new Font(30));
+    private void initCourseInfo(Course course) {
+        sectionInput = new TextField(course.getSection());
+        instructorNameInput = new TextField(course.getInstructor().getName());
+        instructorEmailInput = new TextField(course.getInstructor().getEmail());
 
-        Label sectionLabel = new Label("Section:");
-        TextField sectionInput = new TextField(course.getSection());
-
-        Label instructorNameLabel = new Label("Instructor Name:");
-        TextField instructorNameInput = new TextField(course.getInstructor().getName());
-
-        Label instructorEmailLabel = new Label("Instructor Email:");
-        TextField instructorEmailInput = new TextField(course.getInstructor().getEmail());
-
-        Label gradeBreakdownLabel = new Label("Grade Breakdown:");
-        VBox courseComponentContainer = new VBox();
+        courseComponentContainer = new VBox();
         courseComponentContainer.setSpacing(10);
 
         for (CourseComponent cp : course.getComponents()) {
@@ -304,41 +343,36 @@ public class GradeTrackerUI {
             hbox.setSpacing(10);
             courseComponentContainer.getChildren().add(hbox);
         }
+    }
 
-        Button toDashboardButton = new Button("Go to Dashboard");
-        toDashboardButton.setOnAction(e -> {
-            course.setSection(sectionInput.getText());
-            course.setInstructor(
-                    new Instructor(
-                            instructorNameInput.getText(),
-                            instructorEmailInput.getText()
-                    )
-            );
+    private Scene createCourseInfoScene(Course course) {
+        Label courseLabel = new Label(course.getName());
+        courseLabel.setFont(new Font(30));
+        Label sectionLabel = new Label("Section:");
+        Label instructorNameLabel = new Label("Instructor Name:");
+        Label instructorEmailLabel = new Label("Instructor Email:");
+        Label gradeBreakdownLabel = new Label("Grade Breakdown:");
 
-            Set<CourseComponent> components = new HashSet<>();
-            for (Node node1 : courseComponentContainer.getChildren()) {
-                HBox container = (HBox) node1;
-                String component = "";
-                int percentage = 0;
-                for (Node node2 : container.getChildren()) {
-                    if (node2 instanceof TextField) {
-                        String text = ((TextField)node2).getText();
-                        try {
-                            percentage = Integer.parseInt(text);
-                        } catch (Exception error) {
-                            component = text;
-                        }
-                    }
-                }
+        initCourseInfo(course);
+        Button toDashboardButton = createCourseInfoSubmitButton(course);
+        Button addComponentButton = createCourseInfoAddButton();
 
-                if (!component.isEmpty() && percentage != 0) {
-                    components.add(new CourseComponent(component, percentage));
-                    course.setComponents(components);
-                }
-            }
-            this.primaryStage.setScene(createDashboardScene());
-        });
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(
+                courseLabel, sectionLabel, sectionInput, instructorNameLabel,
+                instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
+                courseComponentContainer, addComponentButton, toDashboardButton
+        );
+        vbox.setSpacing(20);
+        vbox.setPadding(new Insets(20));
 
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        return new Scene(scrollPane);
+    }
+
+    private Button createCourseInfoAddButton() {
         Button addComponentButton = new Button("Add more Component");
         addComponentButton.setOnAction(e -> {
             TextField componentInput = new TextField();
@@ -348,26 +382,47 @@ public class GradeTrackerUI {
             hbox.setSpacing(10);
             courseComponentContainer.getChildren().add(hbox);
         });
+        return addComponentButton;
+    }
 
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                courseLabel,
-                sectionLabel, sectionInput,
-                instructorNameLabel, instructorNameInput,
-                instructorEmailLabel, instructorEmailInput,
-                gradeBreakdownLabel,
-                courseComponentContainer, addComponentButton,
-                toDashboardButton
-        );
+    private Button createCourseInfoSubmitButton(Course course) {
+        Button toDashboardButton = new Button("Done");
+        toDashboardButton.setOnAction(e -> {
+            course.setSection(sectionInput.getText());
+            course.setInstructor(
+                    new Instructor(
+                            instructorNameInput.getText(),
+                            instructorEmailInput.getText()
+                    )
+            );
+            iterateCourseComponents(course);
+            this.primaryStage.setScene(createDashboardScene());
+        });
+        return toDashboardButton;
+    }
 
-        vbox.setSpacing(20);
-        vbox.setPadding(new Insets(20));
+    private void iterateCourseComponents(Course course) {
+        Set<CourseComponent> components = new HashSet<>();
+        for (Node node1 : courseComponentContainer.getChildren()) {
+            HBox container = (HBox) node1;
+            String component = "";
+            int percentage = 0;
+            for (Node node2 : container.getChildren()) {
+                if (node2 instanceof TextField) {
+                    String text = ((TextField)node2).getText();
+                    try {
+                        percentage = Integer.parseInt(text);
+                    } catch (Exception error) {
+                        component = text;
+                    }
+                }
+            }
 
-        ScrollPane scrollPane = new ScrollPane(vbox);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-
-        return new Scene(scrollPane);
+            if (!component.isEmpty() && percentage != 0) {
+                components.add(new CourseComponent(component, percentage));
+                course.setComponents(components);
+            }
+        }
     }
 
     private VBox createInputField(String labelString) {

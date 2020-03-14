@@ -73,8 +73,8 @@ public class FileHandlerTest {
 
     // EFFECTS: returns a mock session list used for testing
     private Set<Session> getMockSessions() {
-        Set<Session> sessions = new HashSet<>();;
-        Set<Course> summerCourses = new HashSet<>();;
+        Set<Session> sessions = new HashSet<>();
+        Set<Course> summerCourses = new HashSet<>();
 
         summerCourses.add(new Course("CPSC310", "L35"));
         summerCourses.add(new Course("ASTR102", "L35"));
