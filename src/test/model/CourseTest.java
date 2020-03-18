@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,17 +16,16 @@ public class CourseTest {
 
     private Course course;
     private Set<CourseComponent> courseComponents;
-    private Term term;
+    private String term;
     private Session session;
 
     @BeforeEach
     void runBefore() {
-        term = new Term("Term 1");
-        Set<Term> terms = new HashSet<>();
-        terms.add(term);
-        terms.add(new Term("Term 2"));
+        term = "Term 1";
+        HashMap<Course, String> courses = new HashMap<>();
+        courses.put(course, term);
 
-        session = new Session(2013, SessionType.WINTER_SESSION, terms);
+        session = new Session(2013, SessionType.WINTER_SESSION, courses);
 
         courseComponents = new HashSet<>();
         courseComponents.add(new CourseComponent("Homework", 20));
@@ -61,11 +61,10 @@ public class CourseTest {
 
     @Test
     void testInit3() {
-        course = new Course("CPSC 110");
+        course = new Course("CPSC 110", "210");
 
         assertEquals("CPSC 110", course.getName());
-        assertTrue(course.getSection().isEmpty());
-        assertTrue(course.getInstructor().isEmpty());
+        assertEquals("210", course.getSection());
         assertTrue(course.getComponents().isEmpty());
     }
 
@@ -75,7 +74,6 @@ public class CourseTest {
 
         assertEquals("CPSC 210", course.getName());
         assertTrue(course.getSection().isEmpty());
-        assertTrue(course.getInstructor().isEmpty());
         assertEquals(courseComponents, course.getComponents());
         assertEquals(term, course.getTerm());
         assertEquals(session, course.getSession());

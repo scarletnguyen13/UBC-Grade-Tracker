@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,16 +12,16 @@ import java.util.Set;
 public class Session implements Serializable {
     private int year;
     private SessionType type;
-    private Set<Term> terms;
+    private HashMap<Course, String> courseTermPair;
 
-    public Session(int year, SessionType type, Set<Term> terms) {
+    public Session(int year, SessionType type, HashMap<Course, String> courseTermPair) {
         this.year = year;
         this.type = type;
-        this.terms = terms;
+        this.courseTermPair = courseTermPair;
     }
 
     public Session(int year, SessionType type) {
-        this(year, type, new HashSet<>());
+        this(year, type, new HashMap<>());
     }
 
     public void setYear(int year) {
@@ -39,24 +40,24 @@ public class Session implements Serializable {
         this.type = type;
     }
 
-    public void setTerms(Set<Term> terms) {
-        this.terms = terms;
+    public void setCourseTermPair(HashMap<Course, String> terms) {
+        this.courseTermPair = terms;
     }
 
-    public Set<Term> getTerms() {
-        return terms;
+    public HashMap<Course, String> getCourseTermPair() {
+        return courseTermPair;
     }
 
     // MODIFIES: this
     // EFFECTS:  adds the given term to the current term list
-    public void addTerm(Term term) {
-        this.terms.add(term);
+    public void addPair(Course course, String term) {
+        this.courseTermPair.put(course, term);
     }
 
     // MODIFIES: this
     // EFFECTS:  removes the given term from the current term list
-    public void removeTerm(Term term) {
-        this.terms.remove(term);
+    public void removeCourse(Course course) {
+        this.courseTermPair.remove(course);
     }
 
     @Override
@@ -69,13 +70,12 @@ public class Session implements Serializable {
         }
         Session session = (Session) o;
         return year == session.year
-                && type == session.type
-                && Objects.equals(terms, session.terms);
+                && type == session.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(year, type, terms);
+        return Objects.hash(year, type);
     }
 
     @Override

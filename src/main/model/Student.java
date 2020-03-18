@@ -32,7 +32,7 @@ public class Student implements Serializable {
     }
 
     public Student() {
-        this("", "", "", "", "", "", new HashSet<Session>());
+        this("", "", "", "", "", "", new HashSet<>());
     }
 
     public void setName(String name) {
@@ -91,26 +91,24 @@ public class Student implements Serializable {
         return sessions;
     }
 
-    // EFFECTS:  returns all the courses the student is taking / has taken so far in UBC
+    // EFFECTS: returns all the courses the student is taking / has taken so far in UBC
     public Set<Course> getAllCourses() {
         Set<Course> courses = new HashSet<>();
         for (Session session : this.sessions) {
-            for (Term term : session.getTerms()) {
-                courses.addAll(term.getCourses());
-            }
+            courses.addAll(session.getCourseTermPair().keySet());
         }
         return courses;
     }
 
-    // EFFECTS: returns the course in all courses if exists, null otherwise
-    public Course findCourseByName(String name) {
-        Course course = null;
-        for (Course c: this.getAllCourses()) {
-            if (c.getName().equals(name)) {
-                course = c;
+    // EFFECTS: returns the session with given year and type, if not found creates and returns a new session
+    public Session findSession(int year, SessionType type) {
+        Session session = new Session(year, type);
+        for (Session s: this.sessions) {
+            if (session.equals(s)) {
+                return s;
             }
         }
-        return course;
+        return session;
     }
 
     // MODIFIES: this
