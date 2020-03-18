@@ -105,7 +105,7 @@ public class TermTest {
         assertTrue(term.equals(new Term(TERM_NAME, courses)));
 
         assertFalse(term.equals(new Instructor()));
-        assertFalse(term.equals(new Term(TERM_NAME)));
+        assertTrue(term.equals(new Term(TERM_NAME)));
         assertFalse(term.equals(null));
         assertFalse(term.equals(new Term("Term 1", courses)));
     }

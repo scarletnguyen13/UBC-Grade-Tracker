@@ -106,6 +106,6 @@ public class Course implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, section, instructor, components);
+        return Objects.hash(name);
     }
 }

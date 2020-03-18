@@ -108,5 +108,11 @@ public class SessionTest {
         assertFalse(session.equals(new Session(2012, SessionType.WINTER_SESSION, terms)));
         assertFalse(session.equals(new Session(2013, SessionType.SUMMER_SESSION, terms)));
         assertFalse(session.equals(new Session(2013, SessionType.WINTER_SESSION, new HashSet<>())));
+
+        Set<Session> testSessions = new HashSet<>();
+        testSessions.add(new Session(2019, SessionType.SUMMER_SESSION, terms));
+        testSessions.add(new Session(2019, SessionType.SUMMER_SESSION, terms));
+
+        assertEquals(1, testSessions.size());
     }
 }

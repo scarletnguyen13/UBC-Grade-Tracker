@@ -41,8 +41,13 @@ public class Term implements Serializable {
 
     // MODIFIES: this
     // EFFECTS:  removes the given course from the current course list
+    // and removes the term from its session if the term is empty
     public void removeCourse(Course course) {
         this.courses.remove(course);
+        if (this.courses.size() == 0) {
+            Session session = course.getSession();
+            session.removeTerm(this);
+        }
     }
 
     public Set<Course> getCourses() {
@@ -63,12 +68,11 @@ public class Term implements Serializable {
             return false;
         }
         Term term = (Term) o;
-        return name.equals(term.name)
-                && courses.equals(term.courses);
+        return name.equals(term.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, courses);
+        return Objects.hash(name);
     }
 }

@@ -142,7 +142,7 @@ public class GradeTrackerUI {
         buttonContainer.setSpacing(30);
 
         vbox.getChildren().addAll(
-                this.createComboBoxContainter(),
+                this.createComboBoxContainer(),
                 addCourseLabel,
                 this.courseTextFieldContainer,
                 buttonContainer
@@ -184,17 +184,18 @@ public class GradeTrackerUI {
                 }
             }
 
-            term.setCourses(courses);
-            currentSession.addTerm(term);
-
-            this.student.addSession(currentSession);
+            if (courses.size() != 0) {
+                term.setCourses(courses);
+                currentSession.addTerm(term);
+                this.student.addSession(currentSession);
+            }
 
             this.primaryStage.setScene(createDashboardScene());
         });
         return submitButton;
     }
 
-    private HBox createComboBoxContainter() {
+    private HBox createComboBoxContainer() {
         yearComboBox = createYearComboBox();
         sessionComboBox = createGeneralComboBox(new String[]{"Winter", "Summer"});
         termComboBox = createGeneralComboBox(new String[]{"Term 1", "Term 2"});
@@ -356,12 +357,15 @@ public class GradeTrackerUI {
         initCourseInfo(course);
         Button toDashboardButton = createCourseInfoSubmitButton(course);
         Button addComponentButton = createCourseInfoAddButton();
+        Button removeCourseButton = createRemoveCourseButton(course);
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
                 courseLabel, sectionLabel, sectionInput, instructorNameLabel,
                 instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
-                courseComponentContainer, addComponentButton, toDashboardButton
+                courseComponentContainer, addComponentButton, toDashboardButton,
+                new VBox(), removeCourseButton
+                // Add an empty space between the remove button with the rest
         );
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
@@ -370,6 +374,25 @@ public class GradeTrackerUI {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         return new Scene(scrollPane);
+    }
+
+    private Button createRemoveCourseButton(Course course) {
+        Button removeCourseButton = new Button("Remove Course");
+        removeCourseButton.setStyle("-fx-background-color: #cf0e00; -fx-text-fill: #fff");
+        removeCourseButton.setOnAction(e -> {
+            String message = "Are you sure?";
+            Alert alert = new Alert(
+                    Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+            );
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.YES) {
+                Term term = course.getTerm();
+                term.removeCourse(course);
+                this.primaryStage.setScene(createDashboardScene());
+            }
+        });
+        return removeCourseButton;
     }
 
     private Button createCourseInfoAddButton() {
