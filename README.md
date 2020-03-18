@@ -33,11 +33,15 @@ student ID, CS ID, phone, email, etc. Name and student ID are required to enter
 the dashboard. Pressing the **Submit** button will either:
     - Pop up an alert if the user has not entered the name or student ID.
     - Otherwise, proceed to next screen.
+
+    ![alt text](image/InfoScene.png "Info Screen")
 <br/><br/>
     
 2. **Session Screen**: the screen that let user add sessions/courses. It takes the session's
 year, term, and courses within that session. If all course fields are empty, no new session
 is created. Press **Submit** button to proceed.
+
+    ![alt text](image/SessionScene.png "Info Screen")
 <br/><br/>
 
 3. **Dashboard Screen**: the screen that displays all user's information so far. From
@@ -54,6 +58,8 @@ this screen, the user can:
     At anytime the user wants to back to the Dashboard Screen, simply press **Submit**
     button, but please be aware that the current state on the screen at the moment of pressing
     will be saved as well.
+    
+    ![alt text](image/DashboardScene.png "Info Screen")
 <br/><br/>          
      
 4. Course Info Screen: the screen that displays and let user update the course's information 
@@ -61,6 +67,8 @@ such as course's section, instructor, components, etc.
     - To edit course: fill out the fields and press the **Submit** button.
     - To remove course: press the **Remove course** red button at the very
 end of the screen.  
+
+    ![alt text](image/CourseInfoScene.png "Info Screen")
 <br/><br/>
        
 #### Data Persistence                              
