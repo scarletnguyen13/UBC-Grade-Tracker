@@ -1,4 +1,4 @@
-# UBC Survival Guide
+# UBC Grade Tracker
 
 ## Project Description
 
@@ -58,6 +58,8 @@ such as course's section, instructor, components, etc.
     - To edit course: fill out the fields and press the **Submit** button.
     - To remove course: press the **Remove course** red button at the very
 end of the screen.  
+       
+       
                                                   
 > All user data including personal information, sessions, and courses will be automatically
 > encoded and saved in a JSON format .txt file located in data folder whenever the user closes
