@@ -35,18 +35,6 @@ public class InstructorTest {
     }
 
     @Test
-    void testIsEmpty() {
-        instructor = new Instructor();
-        assertTrue(instructor.isEmpty());
-
-        instructor = new Instructor("Dirk", "");
-        assertFalse(instructor.isEmpty());
-
-        instructor = new Instructor("", "dirl@gmail.com");
-        assertFalse(instructor.isEmpty());
-    }
-
-    @Test
     void testSetters() {
         instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
 
@@ -60,11 +48,13 @@ public class InstructorTest {
     @Test
     void testEquals() {
         instructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
+        Instructor newInstructor = new Instructor("Dirk", "dirkvandepol@gmail.com");
 
         assertTrue(instructor.equals(instructor));
         assertTrue(instructor.equals(new Instructor("Dirk", "dirkvandepol@gmail.com")));
+        assertTrue(instructor.hashCode() == newInstructor.hashCode());
 
-        assertFalse(instructor.equals(new Term("Term")));
+        assertFalse(instructor.equals(new Course("CPSC 121", "201")));
         assertFalse(instructor.equals(new Instructor("Dirk")));
         assertFalse(instructor.equals(new Instructor("", "dirkvandepol@gmail.com")));
         assertFalse(instructor.equals(null));

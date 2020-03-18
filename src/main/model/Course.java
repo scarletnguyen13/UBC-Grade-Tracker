@@ -14,7 +14,7 @@ public class Course implements Serializable {
     private Instructor instructor;
     private Set<CourseComponent> components;
     private Session session;
-    private Term term;
+    private String term;
 
     public Course(String name, String section,
                   Instructor instructor,
@@ -29,11 +29,7 @@ public class Course implements Serializable {
         this(name, section, new Instructor(), new HashSet<>());
     }
 
-    public Course(String name) {
-        this(name, "", new Instructor(), new HashSet<>());
-    }
-
-    public Course(String name, Set<CourseComponent> components, Term term, Session session) {
+    public Course(String name, Set<CourseComponent> components, String term, Session session) {
         this(name, "", new Instructor(), components);
         this.term = term;
         this.session = session;
@@ -71,11 +67,11 @@ public class Course implements Serializable {
         this.section = section;
     }
 
-    public void setTerm(Term term) {
+    public void setTerm(String term) {
         this.term = term;
     }
 
-    public Term getTerm() {
+    public String getTerm() {
         return term;
     }
 

@@ -39,11 +39,6 @@ public class Instructor implements Serializable {
         this.email = email;
     }
 
-    // EFFECTS: returns true if all the fields are empty, false otherwise
-    public boolean isEmpty() {
-        return this.name.isEmpty() && this.email.isEmpty();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,16 +75,13 @@ public class FileHandlerTest {
     // EFFECTS: returns a mock session list used for testing
     private Set<Session> getMockSessions() {
         Set<Session> sessions = new HashSet<>();
-        Set<Course> summerCourses = new HashSet<>();
+        HashMap<Course, String> summerCourses = new HashMap<>();
 
-        summerCourses.add(new Course("CPSC310", "L35"));
-        summerCourses.add(new Course("ASTR102", "L35"));
-        summerCourses.add(new Course("ECON102", "L35"));
+        summerCourses.put(new Course("CPSC310", "L35"), "Summer Term");
+        summerCourses.put(new Course("ASTR102", "L35"), "Summer Term");
+        summerCourses.put(new Course("ECON102", "L35"), "Summer Term");
 
-        Set<Term> summerTerms = new HashSet<>();
-        summerTerms.add(new Term("Summer Term", summerCourses));
-
-        sessions.add(new Session(2018, SessionType.WINTER_SESSION, summerTerms));
+        sessions.add(new Session(2018, SessionType.WINTER_SESSION, summerCourses));
 
         return sessions;
     }

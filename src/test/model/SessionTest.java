@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SessionTest {
     private Session session;
-    private Set<Term> terms;
+    private HashMap<Course, String> terms;
 
     @BeforeEach
     void runBefore() {
-        terms = new HashSet<>();
-        terms.add(new Term("Term 1"));
-        terms.add(new Term("Term 2"));
+        terms = new HashMap<>();
+        terms.put(new Course("CPSC 121", "201"), "Term 1");
+        terms.put(new Course("CPSC 210", "201"), "Term 2");
     }
 
     @Test
@@ -28,7 +29,7 @@ public class SessionTest {
 
         assertEquals(2013, session.getYear());
         assertEquals(SessionType.WINTER_SESSION, session.getType());
-        assertEquals(terms, session.getTerms());
+        assertEquals(terms, session.getCourseTermPair());
     }
 
     @Test
@@ -37,7 +38,7 @@ public class SessionTest {
 
         assertEquals(2019, session.getYear());
         assertEquals(SessionType.SUMMER_SESSION, session.getType());
-        assertEquals(0, session.getTerms().size());
+        assertEquals(0, session.getCourseTermPair().size());
     }
 
     @Test
@@ -46,54 +47,57 @@ public class SessionTest {
 
         session.setYear(2014);
         session.setType(SessionType.WINTER_SESSION);
-        session.setTerms(terms);
+        session.setCourseTermPair(terms);
 
         assertEquals(2014, session.getYear());
         assertEquals(SessionType.WINTER_SESSION, session.getType());
-        assertEquals(terms, session.getTerms());
+        assertEquals(terms, session.getCourseTermPair());
     }
 
     @Test
     void testAddTerm() {
         session = new Session(2019, SessionType.SUMMER_SESSION);
-        assertEquals(0, session.getTerms().size());
+        assertEquals(0, session.getCourseTermPair().size());
 
-        Term term1 = new Term("Term 1");
-        session.addTerm(term1);
+        String term1 = "Term 1";
+        session.addPair(new Course("CPSC 121", "210"), term1);
 
-        assertEquals(1, session.getTerms().size());
-        assertTrue(session.getTerms().contains(term1));
+        assertEquals(1, session.getCourseTermPair().size());
+        assertTrue(session.getCourseTermPair().containsValue(term1));
 
         // Add again, check for duplication
-        session.addTerm(term1);
-        assertEquals(1, session.getTerms().size());
+        session.addPair(new Course("CPSC 121", "210"), term1);
+        assertEquals(1, session.getCourseTermPair().size());
 
-        Term term1Duplicated = new Term("Term 1");
-        session.addTerm(term1Duplicated);
-        assertEquals(1, session.getTerms().size());
+        String term1Duplicated = "Term 1";
+        session.addPair(new Course("CPSC 121", "210"), term1Duplicated);
+        assertEquals(1, session.getCourseTermPair().size());
 
-        Term term2 = new Term("Term 2");
-        session.addTerm(term2);
-        assertEquals(2, session.getTerms().size());
+        String term2 = "Term 2";
+        session.addPair(new Course("CPSC 210", "121"), term2);
+        assertEquals(2, session.getCourseTermPair().size());
     }
 
     @Test
     void testRemoveTerm() {
         session = new Session(2019, SessionType.SUMMER_SESSION);
-        assertEquals(0, session.getTerms().size());
+        assertEquals(0, session.getCourseTermPair().size());
 
-        Term term1 = new Term("Term 1");
-        Term term2 = new Term("Term 2");
+        String term1 = "Term 1";
+        String term2 = "Term 2";
 
-        session.addTerm(term1);
-        session.addTerm(term2);
+        Course course1 = new Course("CPSC 121", "121");
+        Course course2 = new Course("CPSC 210", "121");
 
-        assertEquals(2, session.getTerms().size());
+        session.addPair(course1, term1);
+        session.addPair(course2, term2);
 
-        session.removeTerm(term2);
-        assertEquals(1, session.getTerms().size());
-        assertTrue(session.getTerms().contains(term1));
-        assertFalse(session.getTerms().contains(term2));
+        assertEquals(2, session.getCourseTermPair().size());
+
+        session.removeCourse(course1);
+        assertEquals(1, session.getCourseTermPair().size());
+        assertFalse(session.getCourseTermPair().keySet().contains(course1));
+        assertTrue(session.getCourseTermPair().keySet().contains(course2));
     }
 
     @Test
@@ -102,17 +106,11 @@ public class SessionTest {
 
         assertTrue(session.equals(session));
         assertTrue(session.equals(new Session(2013, SessionType.WINTER_SESSION, terms)));
+        assertTrue(session.equals(new Session(2013, SessionType.WINTER_SESSION, new HashMap<>())));
 
         assertFalse(session.equals(null));
-        assertFalse(session.equals(new Term("Term 1")));
+        assertFalse(session.equals("Term 1"));
         assertFalse(session.equals(new Session(2012, SessionType.WINTER_SESSION, terms)));
         assertFalse(session.equals(new Session(2013, SessionType.SUMMER_SESSION, terms)));
-        assertFalse(session.equals(new Session(2013, SessionType.WINTER_SESSION, new HashSet<>())));
-
-        Set<Session> testSessions = new HashSet<>();
-        testSessions.add(new Session(2019, SessionType.SUMMER_SESSION, terms));
-        testSessions.add(new Session(2019, SessionType.SUMMER_SESSION, terms));
-
-        assertEquals(1, testSessions.size());
     }
 }

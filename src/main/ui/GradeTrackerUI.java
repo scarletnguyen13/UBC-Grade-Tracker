@@ -1,5 +1,7 @@
 package ui;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,7 +17,32 @@ import persistance.FileHandler;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Represents and displays the app's GUI.
+ */
 public class GradeTrackerUI {
+    private static final String APP_NAME = "UBC Grade Tracker";
+    private static final String SUMMER = "Summer";
+    private static final String WINTER = "Winter";
+    private static final String TERM_1 = "Term 1";
+    private static final String TERM_2 = "Term 2";
+    private static final String SUMMER_TERM = "Summer Term";
+
+    private static final String NAME = "Name";
+    private static final String STUDENT_ID = "Student ID";
+    private static final String CS_ID = "CS ID";
+    private static final String EMAIL = "Email";
+    private static final String PHONE = "Phone";
+    private static final String GPA = "GPA";
+
+    private static final String SUBMIT = "Submit";
+    private static final VBox EMPTY_BOX = new VBox();
+
+    private static final String[] SEASONS = {
+            "Winter", "Winter", "Spring", "Spring", "Summer", "Summer",
+            "Summer", "Summer", "Fall", "Fall", "Winter", "Winter"
+    };
+
     private Stage primaryStage;
     private Student student;
     private FileHandler fileHandler;
@@ -51,8 +78,10 @@ public class GradeTrackerUI {
 
     private void init(Scene scene) {
         primaryStage.setScene(scene);
-        primaryStage.setTitle("UBC Grade Tracker");
-        primaryStage.setWidth(500);
+        primaryStage.setTitle(APP_NAME);
+        primaryStage.setMinWidth(700);
+        primaryStage.setMinHeight(500);
+        primaryStage.setWidth(700);
         primaryStage.setHeight(500);
         primaryStage.show();
     }
@@ -64,22 +93,22 @@ public class GradeTrackerUI {
 
         this.initInfoTextFields();
 
-        VBox nameBox = createInputField("Name");
+        VBox nameBox = createInputField("(*) " + NAME);
         nameBox.getChildren().add(nameTextField);
 
-        VBox studentIdBox = createInputField("Student ID");
+        VBox studentIdBox = createInputField("(*) " + STUDENT_ID);
         studentIdBox.getChildren().add(studentIdTextField);
 
-        VBox csIdBox = createInputField("CS ID");
+        VBox csIdBox = createInputField(CS_ID);
         csIdBox.getChildren().add(csIdTextField);
 
-        VBox emailBox = createInputField("Email");
+        VBox emailBox = createInputField(EMAIL);
         emailBox.getChildren().add(emailTextField);
 
-        VBox phoneBox = createInputField("Phone");
+        VBox phoneBox = createInputField(PHONE);
         phoneBox.getChildren().add(phoneTextField);
 
-        VBox gpaBox = createInputField("GPA");
+        VBox gpaBox = createInputField(GPA);
         gpaBox.getChildren().add(gpaTextField);
 
         Button toSessionSceneButton = createInfoSubmitButton(nextScene);
@@ -89,42 +118,6 @@ public class GradeTrackerUI {
         vbox.setPadding(new Insets(20));
 
         return new Scene(vbox);
-    }
-
-    private Button createInfoSubmitButton(Scene nextScene) {
-        Button button = new Button("Done");
-        button.setOnAction(e -> {
-            this.student.setName(nameTextField.getText());
-            this.student.setStudentId(studentIdTextField.getText());
-            this.student.setCsId(csIdTextField.getText());
-            this.student.setEmail(emailTextField.getText());
-            this.student.setPhone(phoneTextField.getText());
-            this.student.setGpa(gpaTextField.getText());
-
-            this.primaryStage.setScene(nextScene == null ? createDashboardScene() : nextScene);
-        });
-
-        return button;
-    }
-
-    private void initInfoTextFields() {
-        nameTextField = new TextField();
-        nameTextField.setText(this.student.getName());
-
-        studentIdTextField = new TextField();
-        studentIdTextField.setText(this.student.getStudentId());
-
-        csIdTextField = new TextField();
-        csIdTextField.setText(this.student.getCsId());
-
-        emailTextField = new TextField();
-        emailTextField.setText(this.student.getEmail());
-
-        phoneTextField = new TextField();
-        phoneTextField.setText(this.student.getPhone());
-
-        gpaTextField = new TextField();
-        gpaTextField.setText(this.student.getGpa());
     }
 
     private Scene createSessionScene() {
@@ -158,6 +151,87 @@ public class GradeTrackerUI {
         return new Scene(scrollPane);
     }
 
+    private Scene createDashboardScene() {
+        SplitPane pane = new SplitPane();
+        pane.getItems().addAll(createInfoDisplay(), createCourseTable());
+
+        return new Scene(pane);
+    }
+
+    private Scene createCourseInfoScene(Course course) {
+        Label courseLabel = new Label(course.getName());
+        courseLabel.setFont(new Font(30));
+        Label sectionLabel = new Label("Section:");
+        Label instructorNameLabel = new Label("Instructor Name:");
+        Label instructorEmailLabel = new Label("Instructor Email:");
+        Label gradeBreakdownLabel = new Label("Grade Breakdown:");
+
+        initCourseInfo(course);
+        Button toDashboardButton = createCourseInfoSubmitButton(course);
+        Button addComponentButton = createCourseInfoAddButton();
+        Button removeCourseButton = createRemoveCourseButton(course);
+
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(
+                courseLabel, sectionLabel, sectionInput, instructorNameLabel,
+                instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
+                courseComponentContainer, addComponentButton, toDashboardButton,
+                EMPTY_BOX, removeCourseButton
+                // Add an empty space between the remove button with the rest
+        );
+        vbox.setSpacing(20);
+        vbox.setPadding(new Insets(20));
+
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        return new Scene(scrollPane);
+    }
+
+    private void initInfoTextFields() {
+        nameTextField = new TextField();
+        nameTextField.setText(this.student.getName());
+
+        studentIdTextField = new TextField();
+        studentIdTextField.setText(this.student.getStudentId());
+
+        csIdTextField = new TextField();
+        csIdTextField.setText(this.student.getCsId());
+
+        emailTextField = new TextField();
+        emailTextField.setText(this.student.getEmail());
+
+        phoneTextField = new TextField();
+        phoneTextField.setText(this.student.getPhone());
+
+        gpaTextField = new TextField();
+        gpaTextField.setText(this.student.getGpa());
+    }
+
+    private Button createInfoSubmitButton(Scene nextScene) {
+        Button button = new Button(SUBMIT);
+        button.setOnAction(e -> {
+            if (!nameTextField.getText().isEmpty() && !studentIdTextField.getText().isEmpty()) {
+                this.student.setName(nameTextField.getText());
+                this.student.setStudentId(studentIdTextField.getText());
+                this.student.setCsId(csIdTextField.getText());
+                this.student.setEmail(emailTextField.getText());
+                this.student.setPhone(phoneTextField.getText());
+                this.student.setGpa(gpaTextField.getText());
+
+                this.primaryStage.setScene(nextScene == null ? createDashboardScene() : nextScene);
+            } else {
+                String message = "Please fill out all required fields.";
+                Alert alert = new Alert(
+                        Alert.AlertType.CONFIRMATION, message, ButtonType.CANCEL
+                );
+                alert.showAndWait();
+            }
+        });
+
+        return button;
+    }
+
     private Button createAddCourseButton() {
         Button addCourseButton = new Button("Add more Course");
         addCourseButton.setOnAction(e -> {
@@ -167,27 +241,24 @@ public class GradeTrackerUI {
     }
 
     private Button createSessionSubmitButton() {
-        Button submitButton = new Button("Done");
+        Button submitButton = new Button(SUBMIT);
 
         submitButton.setOnAction(e -> {
-            Term term = new Term(termComboBox.getValue().toString());
-            SessionType type = sessionComboBox.getValue().toString().equals("Summer") ? SessionType.SUMMER_SESSION
+            String term = termComboBox.getValue().toString();
+            SessionType type = sessionComboBox.getValue().toString().equals(SUMMER) ? SessionType.SUMMER_SESSION
                     : SessionType.WINTER_SESSION;
 
-            Session currentSession = new Session(Integer.parseInt(yearComboBox.getValue().toString()), type);
+            Session currentSession = student.findSession(Integer.parseInt(yearComboBox.getValue().toString()), type);
+            this.student.addSession(currentSession);
 
-            Set<Course> courses = new HashSet<>();
             for (Node node : courseTextFieldContainer.getChildren()) {
                 String courseName = ((TextField)node).getText();
                 if (!courseName.isEmpty()) {
-                    courses.add(new Course(courseName, initEmptyList(), term, currentSession));
+                    currentSession.addPair(
+                            new Course(courseName, initEmptyList(), term, currentSession),
+                            term
+                    );
                 }
-            }
-
-            if (courses.size() != 0) {
-                term.setCourses(courses);
-                currentSession.addTerm(term);
-                this.student.addSession(currentSession);
             }
 
             this.primaryStage.setScene(createDashboardScene());
@@ -196,9 +267,26 @@ public class GradeTrackerUI {
     }
 
     private HBox createComboBoxContainer() {
+        int month = Calendar.getInstance().get(Calendar.MONTH);
+        String season = SEASONS[month];
+        String defaultType = season.equals(SUMMER) ? SUMMER : WINTER;
+        String defaultTerm = month < 6 ? TERM_2 : TERM_1;
+
         yearComboBox = createYearComboBox();
-        sessionComboBox = createGeneralComboBox(new String[]{"Winter", "Summer"});
-        termComboBox = createGeneralComboBox(new String[]{"Term 1", "Term 2"});
+        sessionComboBox = createGeneralComboBox(new String[]{WINTER, SUMMER}, defaultType);
+        termComboBox = createGeneralComboBox(new String[]{TERM_1, TERM_2}, defaultTerm);
+
+        sessionComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            ObservableList<String> list = FXCollections.observableArrayList();
+            if (newValue.equals(SUMMER)) {
+                list.add(SUMMER_TERM);
+                termComboBox.setValue(SUMMER_TERM);
+            } else {
+                list.addAll(TERM_1, TERM_2);
+                termComboBox.setValue(TERM_1);
+            }
+            termComboBox.setItems(list);
+        });
 
         HBox container = new HBox(yearComboBox, sessionComboBox, termComboBox);
         container.setSpacing(29);
@@ -218,10 +306,10 @@ public class GradeTrackerUI {
         return coursesContainer;
     }
 
-    private ComboBox createGeneralComboBox(String[] options) {
+    private ComboBox createGeneralComboBox(String[] options, String defaultValue) {
         final ComboBox comboBox = new ComboBox();
-        comboBox.getItems().addAll(options[0], options[1]);
-        comboBox.setValue(options[0]);
+        comboBox.getItems().addAll(options);
+        comboBox.setValue(defaultValue);
         return comboBox;
     }
 
@@ -235,19 +323,18 @@ public class GradeTrackerUI {
             years.add(i);
         }
         yearComboBox.getItems().addAll(years);
+
+        String season = SEASONS[Calendar.getInstance().get(Calendar.MONTH)];
+        if (season.equals("Spring")) {
+            currentYear--;
+        }
+
         yearComboBox.setValue(currentYear);
 
         return yearComboBox;
     }
 
-    private Scene createDashboardScene() {
-        SplitPane pane = new SplitPane();
-        pane.getItems().addAll(createInfoDisplay(), createCourseList());
-
-        return new Scene(pane);
-    }
-
-    private TableView createCourseList() {
+    private TableView createCourseTable() {
         TableView tableView = new TableView();
         for (Course course : this.student.getAllCourses()) {
             tableView.getItems().add(course);
@@ -275,7 +362,7 @@ public class GradeTrackerUI {
         TableColumn<String, Session> column2 = new TableColumn<>("Session");
         column2.setCellValueFactory(new PropertyValueFactory<>("session"));
 
-        TableColumn<String, Term> column3 = new TableColumn<>("Term");
+        TableColumn<String, String> column3 = new TableColumn<>("Term");
         column3.setCellValueFactory(new PropertyValueFactory<>("term"));
 
 
@@ -302,24 +389,22 @@ public class GradeTrackerUI {
             this.primaryStage.setScene(createInfoScene(null));
         });
 
-        Button addSessionButton = new Button("Add Session");
+        Button addSessionButton = new Button("Add Session/Courses");
         addSessionButton.setOnAction(e -> {
             this.primaryStage.setScene(createSessionScene());
         });
 
-        HBox hbox = new HBox(editInfoButton, addSessionButton);
-        hbox.setSpacing(30);
-
-        Label nameLabel = new Label("Name: " + this.student.getName());
-        Label studentIdLabel = new Label("Student ID: " + this.student.getStudentId());
-        Label csIdLabel = new Label("CS ID: " + this.student.getCsId());
-        Label emailLabel = new Label("Email: " + this.student.getEmail());
-        Label phoneLabel = new Label("Phone: " + this.student.getPhone());
-        Label gpaLabel = new Label("GPA: " + this.student.getGpa());
+        Label nameLabel = new Label(NAME + ": " + this.student.getName());
+        Label studentIdLabel = new Label(STUDENT_ID + ": " + this.student.getStudentId());
+        Label csIdLabel = new Label(CS_ID + ": " + this.student.getCsId());
+        Label emailLabel = new Label(EMAIL + ": " + this.student.getEmail());
+        Label phoneLabel = new Label(PHONE + ": " + this.student.getPhone());
+        Label gpaLabel = new Label(GPA + ": " + this.student.getGpa());
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
-                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel, hbox
+                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel,
+                editInfoButton, EMPTY_BOX, addSessionButton
         );
 
         vbox.setSpacing(20);
@@ -346,36 +431,6 @@ public class GradeTrackerUI {
         }
     }
 
-    private Scene createCourseInfoScene(Course course) {
-        Label courseLabel = new Label(course.getName());
-        courseLabel.setFont(new Font(30));
-        Label sectionLabel = new Label("Section:");
-        Label instructorNameLabel = new Label("Instructor Name:");
-        Label instructorEmailLabel = new Label("Instructor Email:");
-        Label gradeBreakdownLabel = new Label("Grade Breakdown:");
-
-        initCourseInfo(course);
-        Button toDashboardButton = createCourseInfoSubmitButton(course);
-        Button addComponentButton = createCourseInfoAddButton();
-        Button removeCourseButton = createRemoveCourseButton(course);
-
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                courseLabel, sectionLabel, sectionInput, instructorNameLabel,
-                instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
-                courseComponentContainer, addComponentButton, toDashboardButton,
-                new VBox(), removeCourseButton
-                // Add an empty space between the remove button with the rest
-        );
-        vbox.setSpacing(20);
-        vbox.setPadding(new Insets(20));
-
-        ScrollPane scrollPane = new ScrollPane(vbox);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        return new Scene(scrollPane);
-    }
-
     private Button createRemoveCourseButton(Course course) {
         Button removeCourseButton = new Button("Remove Course");
         removeCourseButton.setStyle("-fx-background-color: #cf0e00; -fx-text-fill: #fff");
@@ -387,8 +442,8 @@ public class GradeTrackerUI {
             alert.showAndWait();
 
             if (alert.getResult() == ButtonType.YES) {
-                Term term = course.getTerm();
-                term.removeCourse(course);
+                Session s = course.getSession();
+                s.removeCourse(course);
                 this.primaryStage.setScene(createDashboardScene());
             }
         });
@@ -409,7 +464,7 @@ public class GradeTrackerUI {
     }
 
     private Button createCourseInfoSubmitButton(Course course) {
-        Button toDashboardButton = new Button("Done");
+        Button toDashboardButton = new Button(SUBMIT);
         toDashboardButton.setOnAction(e -> {
             course.setSection(sectionInput.getText());
             course.setInstructor(
@@ -458,10 +513,12 @@ public class GradeTrackerUI {
     }
 
     public void saveData() {
-        try {
-            this.fileHandler.write(this.student);
-        } catch (IOException e) {
-            System.out.println("Error initializing stream");
+        if (!this.student.getName().isEmpty() && !this.student.getStudentId().isEmpty()) {
+            try {
+                this.fileHandler.write(this.student);
+            } catch (IOException e) {
+                System.out.println("Error initializing stream");
+            }
         }
     }
 

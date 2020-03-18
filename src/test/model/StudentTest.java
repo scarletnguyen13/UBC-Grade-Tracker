@@ -3,7 +3,9 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,49 +16,41 @@ import static org.junit.jupiter.api.Assertions.*;
 class StudentTest {
     private Student student;
     private Set<Session> sessions;
+    private Session session1;
+    private Session session2;
 
-    private Set<Course> term1Courses;
-    private Set<Course> term2Courses;
-
-    private Set<Course> summerCourses;
-
-    private Set<Term> summerTerms;
+    private HashMap<Course, String> winterCourses;
+    private HashMap<Course, String> summerCourses;
 
     @BeforeEach
     void runBefore() {
-        term1Courses = new HashSet<>();
-        term1Courses.add(new Course("MATH100", "L35"));
-        term1Courses.add(new Course("BIOL111", "L35"));
-        term1Courses.add(new Course("ASTR101", "L35"));
-        term1Courses.add(new Course("ECON101", "L35"));
-        term1Courses.add(new Course("CPSC110", "L35"));
+        HashMap<Course, String> term1Courses = new HashMap<>();
+        term1Courses.put(new Course("MATH100", "L35"), "Term 1");
+        term1Courses.put(new Course("BIOL111", "L35"), "Term 1");
+        term1Courses.put(new Course("ASTR101", "L35"), "Term 1");
+        term1Courses.put(new Course("ECON101", "L35"), "Term 1");
+        term1Courses.put(new Course("CPSC110", "L35"), "Term 1");
 
-        term2Courses = new HashSet<>();
-        term2Courses.add(new Course("CPSC121", "L35"));
-        term2Courses.add(new Course("CPSC210", "L35"));
-        term2Courses.add(new Course("MATH101", "L35"));
-        term2Courses.add(new Course("DSCI100", "L35"));
+        HashMap<Course, String> term2Courses = new HashMap<>();
+        term2Courses.put(new Course("CPSC121", "L35"), "Term 2");
+        term2Courses.put(new Course("CPSC210", "L35"), "Term 2");
+        term2Courses.put(new Course("MATH101", "L35"), "Term 2");
+        term2Courses.put(new Course("DSCI100", "L35"), "Term 2");
 
-        Term winterTerm1 = new Term("Term 1", term1Courses);
-        Term winterTerm2 = new Term("Term 2", term2Courses);
+        winterCourses = new HashMap<>();
+        winterCourses.putAll(term1Courses);
+        winterCourses.putAll(term2Courses);
 
-        Set<Term> winterTerms = new HashSet<>();
-        winterTerms.add(winterTerm1);
-        winterTerms.add(winterTerm2);
-
-        summerCourses = new HashSet<>();
-        summerCourses.add(new Course("CPSC310", "L35"));
-        summerCourses.add(new Course("ASTR102", "L35"));
-        summerCourses.add(new Course("ECON102", "L35"));
-
-        Term summerTerm = new Term("Summer Term", summerCourses);
-
-        summerTerms = new HashSet<>();
-        summerTerms.add(summerTerm);
+        summerCourses = new HashMap<>();
+        summerCourses.put(new Course("CPSC310", "L35"), "Summer Term");
+        summerCourses.put(new Course("ASTR102", "L35"), "Summer Term");
+        summerCourses.put(new Course("ECON102", "L35"), "Summer Term");
 
         sessions = new HashSet<>();
-        sessions.add(new Session(2019, SessionType.SUMMER_SESSION, winterTerms));
-        sessions.add(new Session(2018, SessionType.WINTER_SESSION, summerTerms));
+        session1 = new Session(2019, SessionType.SUMMER_SESSION, winterCourses);
+        session2 = new Session(2018, SessionType.WINTER_SESSION, summerCourses);
+        sessions.add(session1);
+        sessions.add(session2);
 
         student = new Student("Scarlet Nguyen", "44304491", sessions);
     }
@@ -127,17 +121,11 @@ class StudentTest {
         assertEquals(12, student.getAllCourses().size());
     }
 
-    @Test
-    void testFindCourseByName() {
-        assertEquals(new Course("CPSC121"), student.findCourseByName("CPSC121"));
-        assertEquals(null, student.findCourseByName("CPSC400"));
-    }
-
     @Test void testAddSession() {
         assertEquals(2, this.student.getSessions().size());
-        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerTerms));
+        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, winterCourses));
         assertEquals(3, this.student.getSessions().size());
-        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerTerms));
+        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerCourses));
         assertEquals(3, this.student.getSessions().size());
     }
 
@@ -147,5 +135,17 @@ class StudentTest {
                                 + "Student ID: " + this.student.getStudentId() + "\n"
                                 + "Sessions: " + this.sessions + "\n";
         assertEquals(expectedResult, student.toString());
+    }
+
+    @Test
+    void testFindSession() {
+        Session session = this.student.findSession(2019, SessionType.SUMMER_SESSION);
+        assertEquals(session1, session);
+
+        session = this.student.findSession(2018, SessionType.WINTER_SESSION);
+        assertEquals(session2, session);
+
+        session = this.student.findSession(2020, SessionType.WINTER_SESSION);
+        assertEquals(new Session(2020, SessionType.WINTER_SESSION), session);
     }
 }
