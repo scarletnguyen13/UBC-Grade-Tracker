@@ -4,8 +4,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -79,10 +81,10 @@ public class GradeTrackerUI {
     private void init(Scene scene) {
         primaryStage.setScene(scene);
         primaryStage.setTitle(APP_NAME);
-        primaryStage.setMinWidth(700);
-        primaryStage.setMinHeight(500);
-        primaryStage.setWidth(700);
-        primaryStage.setHeight(500);
+        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(700);
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(700);
         primaryStage.show();
     }
 
@@ -114,7 +116,7 @@ public class GradeTrackerUI {
         Button toSessionSceneButton = createInfoSubmitButton(nextScene);
 
         vbox.getChildren().addAll(nameBox, studentIdBox, csIdBox, emailBox, phoneBox, gpaBox, toSessionSceneButton);
-        vbox.setSpacing(20);
+        vbox.setSpacing(40);
         vbox.setPadding(new Insets(20));
 
         return new Scene(vbox);
@@ -126,6 +128,7 @@ public class GradeTrackerUI {
         VBox.setVgrow(list, Priority.ALWAYS);
 
         Label addCourseLabel = new Label("Courses: ");
+        addCourseLabel.setFont(new Font(25));
         courseTextFieldContainer = createTextFieldsContainer();
 
         Button addCourseButton = createAddCourseButton();
@@ -141,7 +144,7 @@ public class GradeTrackerUI {
                 buttonContainer
         );
 
-        vbox.setSpacing(20);
+        vbox.setSpacing(30);
         vbox.setPadding(new Insets(20));
 
         ScrollPane scrollPane = new ScrollPane(vbox);
@@ -171,13 +174,12 @@ public class GradeTrackerUI {
         Button addComponentButton = createCourseInfoAddButton();
         Button removeCourseButton = createRemoveCourseButton(course);
 
+        HBox hbox = new HBox(courseComponentContainer, createPieChart(course));
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
                 courseLabel, sectionLabel, sectionInput, instructorNameLabel,
                 instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
-                courseComponentContainer, addComponentButton, toDashboardButton,
-                EMPTY_BOX, removeCourseButton
-                // Add an empty space between the remove button with the rest
+                hbox, addComponentButton, toDashboardButton, EMPTY_BOX, removeCourseButton
         );
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
@@ -421,9 +423,9 @@ public class GradeTrackerUI {
         courseComponentContainer = new VBox();
         courseComponentContainer.setSpacing(10);
 
-        for (CourseComponent cp : course.getComponents()) {
-            TextField componentInput = new TextField(cp.getName());
-            TextField percentageInput = new TextField(cp.getPercentage() + "");
+        for (Map.Entry<String, Integer> component : course.getComponents().entrySet()) {
+            TextField componentInput = new TextField(component.getKey());
+            TextField percentageInput = new TextField(component.getValue().toString());
             percentageInput.setPrefWidth(50);
             HBox hbox = new HBox(componentInput, percentageInput, new Label("%"));
             hbox.setSpacing(10);
@@ -479,8 +481,27 @@ public class GradeTrackerUI {
         return toDashboardButton;
     }
 
+    private AnchorPane createPieChart(Course course) {
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (Map.Entry<String, Integer> component : course.getComponents().entrySet()) {
+            if (!component.getKey().isEmpty() && component.getValue() != 0) {
+                pieChartData.add(new PieChart.Data(component.getKey(), component.getValue()));
+            }
+        }
+//        pieChartData.sorted();
+        PieChart chart = new PieChart(pieChartData);
+        chart.setTitle("Visualization");
+        chart.setLabelLineLength(10);
+        chart.setLegendSide(Side.BOTTOM);
+
+        AnchorPane anchor = new AnchorPane();
+        anchor.getChildren().add(pieChartData.size() > 0 ? chart : EMPTY_BOX);
+
+        return anchor;
+    }
+
     private void iterateCourseComponents(Course course) {
-        Set<CourseComponent> components = new HashSet<>();
+        HashMap<String, Integer> components = new HashMap<>();
         for (Node node1 : courseComponentContainer.getChildren()) {
             HBox container = (HBox) node1;
             String component = "";
@@ -497,7 +518,7 @@ public class GradeTrackerUI {
             }
 
             if (!component.isEmpty() && percentage != 0) {
-                components.add(new CourseComponent(component, percentage));
+                components.put(component, percentage);
                 course.setComponents(components);
             }
         }
@@ -522,11 +543,11 @@ public class GradeTrackerUI {
         }
     }
 
-    private static Set<CourseComponent> initEmptyList() {
-        Set<CourseComponent> set = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            set.add(new CourseComponent("", 0));
+    private static HashMap<String, Integer> initEmptyList() {
+        HashMap<String, Integer> map = new HashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            map.put("Example #" + i, 20);
         }
-        return set;
+        return map;
     }
 }

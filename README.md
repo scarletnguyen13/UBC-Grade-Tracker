@@ -67,6 +67,8 @@ such as course's section, instructor, components, etc.
     - To edit course: fill out the fields and press the **Submit** button.
     - To remove course: press the **Remove course** red button at the very
 end of the screen.  
+    *Note*: the user will not see course's components visualization's update until submit
+    and come back later.
 
     ![alt text](image/CourseInfoScene.png "Info Screen")
 <br/><br/>

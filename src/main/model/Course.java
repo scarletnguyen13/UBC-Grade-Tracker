@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -12,13 +13,13 @@ public class Course implements Serializable {
     private String name;
     private String section;
     private Instructor instructor;
-    private Set<CourseComponent> components;
+    private HashMap<String, Integer> components;
     private Session session;
     private String term;
 
     public Course(String name, String section,
                   Instructor instructor,
-                  Set<CourseComponent> components) {
+                  HashMap<String, Integer> components) {
         this.name = name;
         this.section = section;
         this.instructor = instructor;
@@ -26,20 +27,20 @@ public class Course implements Serializable {
     }
 
     public Course(String name, String section) {
-        this(name, section, new Instructor(), new HashSet<>());
+        this(name, section, new Instructor(), new HashMap<>());
     }
 
-    public Course(String name, Set<CourseComponent> components, String term, Session session) {
+    public Course(String name, HashMap<String, Integer> components, String term, Session session) {
         this(name, "", new Instructor(), components);
         this.term = term;
         this.session = session;
     }
 
-    public void setComponents(Set<CourseComponent> components) {
+    public void setComponents(HashMap<String, Integer> components) {
         this.components = components;
     }
 
-    public Set<CourseComponent> getComponents() {
+    public HashMap<String, Integer> getComponents() {
         return components;
     }
 
