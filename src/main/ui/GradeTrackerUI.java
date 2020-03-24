@@ -2,6 +2,8 @@ package ui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -298,13 +300,10 @@ public class GradeTrackerUI {
 
     private VBox createTextFieldsContainer() {
         VBox coursesContainer = new VBox();
-
         for (int i = 0; i < 5; i++) {
             coursesContainer.getChildren().add(new TextField());
         }
-
         coursesContainer.setSpacing(10);
-
         return coursesContainer;
     }
 
@@ -336,11 +335,14 @@ public class GradeTrackerUI {
         return yearComboBox;
     }
 
-    private TableView createCourseTable() {
+    private VBox createCourseTable() {
         TableView tableView = new TableView();
-        for (Course course : this.student.getAllCourses()) {
-            tableView.getItems().add(course);
-        }
+        ObservableList<Course> data = FXCollections.observableArrayList(this.student.getAllCourses());
+        FilteredList<Course> filteredData = new FilteredList(data, c -> true); //Pass the data to a filtered list
+        SortedList<Course>   sortableData = new SortedList<>(filteredData);
+        tableView.setItems(sortableData);
+        sortableData.comparatorProperty().bind(tableView.comparatorProperty());
+
         this.initProps(tableView);
 
         tableView.setRowFactory(tv -> {
@@ -354,7 +356,53 @@ public class GradeTrackerUI {
             return row;
         });
 
-        return tableView;
+        VBox vbox = new VBox(createSearchContainer(filteredData), tableView);
+        VBox.setVgrow(tableView, Priority.ALWAYS);
+
+        return vbox;
+    }
+
+    private HBox createSearchContainer(FilteredList<Course> filteredData) {
+        ChoiceBox<String> choiceBox = createSearchChoiceBox();
+        TextField textField = createSearchTextField(choiceBox, filteredData);
+
+        choiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                textField.setText("");
+                filteredData.setPredicate(null);
+            }
+        });
+        HBox hbox = new HBox(5, choiceBox, textField);
+        HBox.setHgrow(textField, Priority.ALWAYS);
+        return hbox;
+    }
+
+    private ChoiceBox<String> createSearchChoiceBox() {
+        ChoiceBox<String> choiceBox = new ChoiceBox();
+        choiceBox.getItems().addAll("Course", "Session");
+        choiceBox.setValue("Course");
+
+        return choiceBox;
+    }
+
+    private TextField createSearchTextField(ChoiceBox<String> choiceBox, FilteredList<Course> flCourse) {
+        TextField textField = new TextField();
+        textField.setPromptText("Search...");
+
+        textField.setOnKeyReleased(keyEvent -> {
+            switch (choiceBox.getValue()) {
+                case "Course":
+                    flCourse.setPredicate(c -> c.getName().toLowerCase()
+                            .contains(textField.getText().toLowerCase().trim()));
+                    break;
+                case "Session":
+                    flCourse.setPredicate(c -> c.getSession().toString().toLowerCase()
+                            .contains(textField.getText().toLowerCase().trim()));
+                    break;
+            }
+        });
+
+        return textField;
     }
 
     private void initProps(TableView tableView) {
@@ -488,7 +536,6 @@ public class GradeTrackerUI {
                 pieChartData.add(new PieChart.Data(component.getKey(), component.getValue()));
             }
         }
-//        pieChartData.sorted();
         PieChart chart = new PieChart(pieChartData);
         chart.setTitle("Visualization");
         chart.setLabelLineLength(10);
