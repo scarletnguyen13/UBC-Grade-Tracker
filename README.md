@@ -87,8 +87,9 @@ end of the screen.
         - the two methods above are tested thoroughly in FileHandlerTest, 
         each has one test for the case where the exception is expected and 
         another where the exception is not expected
-   - *Include a type hierarchy in your code*: I have the class Instructor and Student both 
-   extends the abstract class Person
+   - *Include a type hierarchy in your code*: 
+        - Both of the Instructor and Student models extend the abstract class Person
+        - All the scenes in the UI extend the abstract class MyScene
    - *Make appropriate use of the Map interface somewhere in your code*: I implement the 
    HashMap data structure to store the Course and the Term altogether inside the Session model.
    - *Make appropriate use of a bi-directional association somewhere in your code*: I have a 
@@ -115,4 +116,9 @@ end of the screen.
         As a result, I removed the Term model and turn it into a simple String. 
         Along with the use of HashMap and unique course code, I can now associate 
         any course with a term in a Session without having to iterate through triple 
-        for-loops.                                                                                                                                                                                                                
+        for-loops.
+   - I used to have a giant monolith file (~1000 loc) for UI and it was extremely hard
+   to read. So I broke the UI into smaller scenes and and make each of them an instance. 
+   As a result, the readability has improved significantly and now, I can easily make 
+   changes to the scenes individually. In addition, all of the duplication among the scenes
+   has been moved to the MyScene abstract class altogether.                                                                                                                                                                                                                

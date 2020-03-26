@@ -2,6 +2,7 @@ package ui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import ui.scene.*;
 
 public class Main extends Application {
     private GradeTrackerUI ui;
@@ -11,8 +12,11 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        ui = new GradeTrackerUI(primaryStage);
+    public void start(Stage primaryStage) {
+        DashboardScene dashboardScene = new DashboardScene(primaryStage);
+        StudentInfoScene studentInfoScene = new StudentInfoScene(primaryStage);
+        SessionScene sessionScene = new SessionScene(primaryStage);
+        ui = new GradeTrackerUI(primaryStage, dashboardScene, studentInfoScene, sessionScene);
     }
 
     @Override
