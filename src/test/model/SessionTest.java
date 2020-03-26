@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -96,8 +94,8 @@ public class SessionTest {
 
         session.removeCourse(course1);
         assertEquals(1, session.getCourseTermPair().size());
-        assertFalse(session.getCourseTermPair().keySet().contains(course1));
-        assertTrue(session.getCourseTermPair().keySet().contains(course2));
+        assertFalse(session.getCourseTermPair().containsKey(course1));
+        assertTrue(session.getCourseTermPair().containsKey(course2));
     }
 
     @Test

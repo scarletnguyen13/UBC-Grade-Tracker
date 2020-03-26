@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the Student class.
@@ -60,7 +61,7 @@ class StudentTest {
         student = new Student(
                 "Scarlet Nguyen", "44304491", "d6x2b",
                 "scarlet.nguyen01@gmail.com", "(604) 369-9123",
-                "3.8", sessions
+                "3.8", sessions, new TreeSet<>()
         );
 
         assertEquals("Scarlet Nguyen", student.getName());
@@ -70,6 +71,7 @@ class StudentTest {
         assertEquals("(604) 369-9123", student.getPhone());
         assertEquals("3.8", student.getGpa());
         assertEquals(sessions, student.getSessions());
+        assertEquals(new TreeSet<>(), student.getTodoList());
     }
 
     @Test
@@ -121,7 +123,8 @@ class StudentTest {
         assertEquals(12, student.getAllCourses().size());
     }
 
-    @Test void testAddSession() {
+    @Test
+    void testAddSession() {
         assertEquals(2, this.student.getSessions().size());
         this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, winterCourses));
         assertEquals(3, this.student.getSessions().size());
@@ -131,9 +134,9 @@ class StudentTest {
 
     @Test
     void testToString() {
-        String expectedResult =   "Name: " + this.student.getName() + "\n"
-                                + "Student ID: " + this.student.getStudentId() + "\n"
-                                + "Sessions: " + this.sessions + "\n";
+        String expectedResult = "Name: " + this.student.getName() + "\n"
+                + "Student ID: " + this.student.getStudentId() + "\n"
+                + "Sessions: " + this.sessions + "\n";
         assertEquals(expectedResult, student.toString());
     }
 
@@ -147,5 +150,64 @@ class StudentTest {
 
         session = this.student.findSession(2020, SessionType.WINTER_SESSION);
         assertEquals(new Session(2020, SessionType.WINTER_SESSION), session);
+    }
+
+    @Test
+    void testAddTodoItem() {
+        Course course = new Course("CPSC 210", "201");
+        CourseComponent component = new CourseComponent("Quizzes", 40);
+        CoursePair coursePair = new CoursePair(course, component);
+
+        TodoItem item = new TodoItem("Quiz #1", coursePair, new Grade(0.0, 0.0));
+
+        CoursePair coursePair2 = new CoursePair(
+                new Course("CPSC 110", "L21"),
+                new CourseComponent("Homework", 20)
+        );
+        TodoItem item2 = new TodoItem("Homework #2", coursePair2, new Grade(0.0, 0.0));
+
+        assertTrue(student.getTodoList().isEmpty());
+        student.addTodoItem(item);
+        assertEquals(1, student.getTodoList().size());
+
+        // add again
+        student.addTodoItem(item);
+        assertEquals(1, student.getTodoList().size());
+
+        student.addTodoItem(item2);
+        assertEquals(2, student.getTodoList().size());
+    }
+
+    @Test
+    void testRemoveTodoItem() {
+        CoursePair coursePair1 = new CoursePair(null, null);
+        TodoItem item1 = new TodoItem("Quiz #1", coursePair1, new Grade(0.0, 0.0));
+
+        CourseComponent component = new CourseComponent("Homework", 20);
+        component.setTotalMarkGained(80);
+        component.setMaxMark(100);
+        CoursePair coursePair2 = new CoursePair(
+                new Course("CPSC 110", "L21"),
+                component
+        );
+        TodoItem item2 = new TodoItem("Homework #2", coursePair2, new Grade(40.0, 60.0));
+
+        student.addTodoItem(item1);
+        student.addTodoItem(item2);
+
+        assertEquals(2, student.getTodoList().size());
+        student.removeTodoItem(item1);
+        assertEquals(1, student.getTodoList().size());
+        student.removeTodoItem(item1);
+        assertEquals(1, student.getTodoList().size());
+        student.removeTodoItem(item2);
+        assertEquals(0, student.getTodoList().size());
+        assertEquals(40.0, component.getTotalMarkGained());
+        assertEquals(40.0, component.getMaxMark());
+
+        HashSet<TodoItem> items = new HashSet<>();
+        items.add(item1);
+        items.add(item2);
+        student.setTodoList(items);
     }
 }

@@ -12,13 +12,17 @@ import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.*;
 import persistance.FileHandler;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -51,6 +55,7 @@ public class GradeTrackerUI {
     private Student student;
     private FileHandler fileHandler;
 
+    // INFO SCENE
     private TextField nameTextField;
     private TextField studentIdTextField;
     private TextField csIdTextField;
@@ -58,14 +63,26 @@ public class GradeTrackerUI {
     private TextField phoneTextField;
     private TextField gpaTextField;
 
+    // ADD SESSION SCENE
     private ComboBox yearComboBox;
     private ComboBox sessionComboBox;
     private ComboBox termComboBox;
     private VBox courseTextFieldContainer;
 
+    // ADD TODOITEM SCENE
+    private TextField descriptionInput;
+    private DatePicker datePicker;
+    private ComboBox courseComboBox;
+    private ComboBox componentComboBox;
+    private TextField markInput;
+    private TextField outOfInput;
+    private CheckBox isCompleted;
+
+    // COURSE INFO SCENE
     private TextField sectionInput;
     private TextField instructorNameInput;
     private TextField instructorEmailInput;
+    private TextField finalGradeInput;
     private VBox courseComponentContainer;
 
     public GradeTrackerUI(Stage primaryStage) {
@@ -78,6 +95,24 @@ public class GradeTrackerUI {
             this.student = new Student();
             init(createInfoScene(createSessionScene()));
         }
+    }
+
+    private static Set<CourseComponent> initSampleComponentList() {
+        Set<CourseComponent> components = new TreeSet<>();
+        components.add(new CourseComponent("Homework", 20));
+        components.add(new CourseComponent("Quizzes", 30));
+        components.add(new CourseComponent("Exam", 50));
+        return components;
+    }
+
+    private static double round(double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
+    }
+
+    private static boolean isBefore(LocalDate date) {
+        LocalDate today = LocalDate.now();
+        return today.compareTo(date) <= 0;
     }
 
     private void init(Scene scene) {
@@ -134,15 +169,14 @@ public class GradeTrackerUI {
         courseTextFieldContainer = createTextFieldsContainer();
 
         Button addCourseButton = createAddCourseButton();
-        Button toDashboardButton = createSessionSubmitButton();
-
-        HBox buttonContainer = new HBox(addCourseButton, toDashboardButton);
-        buttonContainer.setSpacing(30);
+        HBox buttonContainer = createCancelButtonContainer();
+        buttonContainer.getChildren().add(createSessionSubmitButton());
 
         vbox.getChildren().addAll(
                 this.createComboBoxContainer(),
                 addCourseLabel,
                 this.courseTextFieldContainer,
+                addCourseButton,
                 buttonContainer
         );
 
@@ -169,27 +203,159 @@ public class GradeTrackerUI {
         Label sectionLabel = new Label("Section:");
         Label instructorNameLabel = new Label("Instructor Name:");
         Label instructorEmailLabel = new Label("Instructor Email:");
+        Label finalGradeLabel = new Label("Final Grade (out of 100):");
         Label gradeBreakdownLabel = new Label("Grade Breakdown:");
-
         initCourseInfo(course);
-        Button toDashboardButton = createCourseInfoSubmitButton(course);
+        HBox buttonContainer = createCancelButtonContainer();
+        buttonContainer.getChildren().add(createCourseInfoSubmitButton(course));
         Button addComponentButton = createCourseInfoAddButton();
         Button removeCourseButton = createRemoveCourseButton(course);
-
-        HBox hbox = new HBox(courseComponentContainer, createPieChart(course));
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                courseLabel, sectionLabel, sectionInput, instructorNameLabel,
-                instructorNameInput, instructorEmailLabel, instructorEmailInput, gradeBreakdownLabel,
-                hbox, addComponentButton, toDashboardButton, EMPTY_BOX, removeCourseButton
+        HBox hbox = new HBox(createPieChart(course), new VBox(20, courseComponentContainer, addComponentButton));
+        VBox vbox = new VBox(20,
+                courseLabel, sectionLabel, sectionInput, instructorNameLabel, instructorNameInput, instructorEmailLabel,
+                instructorEmailInput, finalGradeLabel, finalGradeInput, gradeBreakdownLabel, hbox, buttonContainer,
+                EMPTY_BOX, removeCourseButton
         );
-        vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
-
         ScrollPane scrollPane = new ScrollPane(vbox);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         return new Scene(scrollPane);
+    }
+
+    private Scene createAddTodoScene(TodoItem item) {
+        VBox vbox = new VBox(20);
+        ListView list = new ListView();
+        VBox.setVgrow(list, Priority.ALWAYS);
+
+        initAddTodoItem(item);
+
+        Label descriptionLabel = new Label("(*) Task Description: ");
+        HBox courseContainer = new HBox(50, courseComboBox, componentComboBox);
+
+        Label deadlineLabel = new Label("(*) Deadline: ");
+        Label courseLabel = new Label("(*) Course & Component: ");
+        Label gradeLabel = new Label("Mark: ");
+        HBox gradeContainer = new HBox(20, markInput, new Label("out of"), outOfInput);
+
+        HBox buttonContainer = createCancelButtonContainer();
+        buttonContainer.getChildren().add(createAddTodoItemButton(item));
+
+        Button removeTodoItemButton = createRemoveTodoItemButton(item);
+
+        vbox.getChildren().addAll(
+                descriptionLabel, descriptionInput, deadlineLabel, datePicker, courseLabel,
+                courseContainer, gradeLabel, gradeContainer, isCompleted, buttonContainer,
+                item.getCoursePair().isEmpty() ? EMPTY_BOX : removeTodoItemButton
+        );
+        vbox.setPadding(new Insets(20));
+        return new Scene(vbox);
+    }
+
+    private HBox createCancelButtonContainer() {
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(e -> {
+            primaryStage.setScene(createDashboardScene());
+        });
+        HBox hbox = new HBox(20, cancelButton);
+        hbox.setAlignment(Pos.CENTER_LEFT);
+        return hbox;
+    }
+
+    private Button createAddTodoItemButton(TodoItem item) {
+        Button submitButton = new Button(SUBMIT);
+        submitButton.setOnAction(e -> {
+            String description = descriptionInput.getText();
+            LocalDate deadline = datePicker.getValue();
+            deadline.atTime(Calendar.HOUR, Calendar.MINUTE, Calendar.SECOND);
+            Course course = (Course) courseComboBox.getValue();
+            Grade grade = getGradeFromInput();
+            boolean completed = isCompleted.isSelected();
+            addTodoItemAction(item, course, grade, description, deadline, completed);
+        });
+        return submitButton;
+    }
+
+    private void addTodoItemAction(
+            TodoItem item, Course course, Grade grade, String description, LocalDate deadline, boolean completed
+    ) {
+        if (checkAddTodoCondition()) {
+            CourseComponent component = course.findComponentByName(componentComboBox.getValue().toString());
+            CoursePair coursePair = new CoursePair(course, component);
+
+            double currentMark = component.getTotalMarkGained() + grade.mark;
+            double currentMax = component.getMaxMark() + grade.outOf;
+
+            if (this.student.getTodoList().contains(item)) {
+                currentMark -= item.getGrade().mark;
+                currentMax -= item.getGrade().outOf;
+                item.setProps(description, coursePair, deadline, grade, completed);
+            } else {
+                this.student.addTodoItem(new TodoItem(description, coursePair, deadline, grade, completed));
+            }
+
+            component.setTotalMarkGained(currentMark);
+            component.setMaxMark(currentMax);
+            primaryStage.setScene(createDashboardScene());
+        } else {
+            throwFillOutAlert();
+        }
+    }
+
+    private boolean checkAddTodoCondition() {
+        return !descriptionInput.getText().isEmpty() && !datePicker.getValue().equals(null)
+                && courseComboBox.getValue() != null && componentComboBox.getValue() != null;
+    }
+
+    private Grade getGradeFromInput() {
+        Grade grade;
+        try {
+            grade = new Grade(Double.parseDouble(markInput.getText()), Double.parseDouble(outOfInput.getText()));
+        } catch (Exception err) {
+            grade = new Grade(0.0, 0.0);
+        }
+        return grade;
+    }
+
+    private void initAddTodoItem(TodoItem item) {
+        descriptionInput = new TextField(item.getDescription());
+        datePicker = new DatePicker(item.getDeadline());
+        initCourseComboBox(item.getCoursePair().course);
+        initComponentComboBox(item.getCoursePair());
+        markInput = new TextField(item.getGrade().mark.toString());
+        outOfInput = new TextField(item.getGrade().outOf.toString());
+        isCompleted = new CheckBox("Is Completed?");
+        isCompleted.setSelected(item.isCompleted());
+    }
+
+    private void initComponentComboBox(CoursePair coursePair) {
+        componentComboBox = new ComboBox<CourseComponent>();
+        componentComboBox.setPromptText("Component");
+        if (coursePair.course != null && coursePair.component != null) {
+            ObservableList<CourseComponent> components =
+                    FXCollections.observableArrayList(coursePair.course.getComponents());
+            componentComboBox.setItems(components);
+            componentComboBox.setValue(coursePair.component);
+            componentComboBox.setDisable(true);
+            componentComboBox.setOpacity(1);
+        }
+    }
+
+    private void initCourseComboBox(Course course) {
+        courseComboBox = new ComboBox<Course>();
+        ObservableList<Course> courses = FXCollections.observableArrayList(this.student.getAllCourses());
+        courseComboBox.setItems(courses);
+        courseComboBox.setPromptText("Course");
+        courseComboBox.setValue(course);
+        if (course != null) {
+            courseComboBox.setDisable(true);
+            courseComboBox.setOpacity(1);
+        }
+        courseComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            ObservableList<CourseComponent> list =
+                    FXCollections.observableArrayList(((Course) newValue).getComponents());
+            componentComboBox.setItems(list);
+        });
     }
 
     private void initInfoTextFields() {
@@ -225,15 +391,19 @@ public class GradeTrackerUI {
 
                 this.primaryStage.setScene(nextScene == null ? createDashboardScene() : nextScene);
             } else {
-                String message = "Please fill out all required fields.";
-                Alert alert = new Alert(
-                        Alert.AlertType.CONFIRMATION, message, ButtonType.CANCEL
-                );
-                alert.showAndWait();
+                throwFillOutAlert();
             }
         });
 
         return button;
+    }
+
+    private void throwFillOutAlert() {
+        String message = "Please fill out all required fields.";
+        Alert alert = new Alert(
+                Alert.AlertType.CONFIRMATION, message, ButtonType.CANCEL
+        );
+        alert.showAndWait();
     }
 
     private Button createAddCourseButton() {
@@ -256,10 +426,10 @@ public class GradeTrackerUI {
             this.student.addSession(currentSession);
 
             for (Node node : courseTextFieldContainer.getChildren()) {
-                String courseName = ((TextField)node).getText();
+                String courseName = ((TextField) node).getText();
                 if (!courseName.isEmpty()) {
                     currentSession.addPair(
-                            new Course(courseName, initEmptyList(), term, currentSession),
+                            new Course(courseName, initSampleComponentList(), term, currentSession),
                             term
                     );
                 }
@@ -335,20 +505,73 @@ public class GradeTrackerUI {
         return yearComboBox;
     }
 
+    private TableView createTodoTable() {
+        TableView tableView = new TableView();
+        ObservableList<TodoItem> data = FXCollections.observableArrayList(this.student.getTodoList());
+        SortedList<TodoItem> sortableData = new SortedList<>(data);
+        tableView.setItems(sortableData);
+        sortableData.comparatorProperty().bind(tableView.comparatorProperty());
+
+        initTodoTableProps(tableView);
+
+        tableView.setRowFactory(tv -> {
+            TableRow<TodoItem> row = new TableRow<>();
+
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    TodoItem item = row.getItem();
+                    this.primaryStage.setScene(createAddTodoScene(item));
+                }
+            });
+            return row;
+        });
+
+        return tableView;
+    }
+
+    private void initTodoTableProps(TableView tableView) {
+        TableColumn<TodoItem, TodoItem> column1 = new TableColumn<>("Task");
+        column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<TodoItem, TodoItem> column2 = new TableColumn<>("Deadline");
+        column2.setCellValueFactory(new PropertyValueFactory<>("deadline"));
+
+        TableColumn<TodoItem, TodoItem> column3 = new TableColumn<>("Course");
+        column3.setCellValueFactory(new PropertyValueFactory<>("coursePair"));
+
+        tableView.getColumns().add(column1);
+        tableView.getColumns().add(column2);
+        tableView.getColumns().add(column3);
+
+        column1.prefWidthProperty().bind(tableView.widthProperty().multiply(0.33));
+        column2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.33));
+        column3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.33));
+
+        tableView.setEditable(true);
+        tableView.setPrefWidth(150);
+
+        tableView.getSortOrder().add(column2);
+        tableView.getSortOrder().add(column1);
+        tableView.getSortOrder().add(column3);
+        tableView.sort();
+
+        tableView.setPlaceholder(new Label("Todo list is empty"));
+    }
+
     private VBox createCourseTable() {
         TableView tableView = new TableView();
         ObservableList<Course> data = FXCollections.observableArrayList(this.student.getAllCourses());
         FilteredList<Course> filteredData = new FilteredList(data, c -> true); //Pass the data to a filtered list
-        SortedList<Course>   sortableData = new SortedList<>(filteredData);
+        SortedList<Course> sortableData = new SortedList<>(filteredData);
         tableView.setItems(sortableData);
         sortableData.comparatorProperty().bind(tableView.comparatorProperty());
 
-        this.initProps(tableView);
+        this.initCourseTableProps(tableView);
 
         tableView.setRowFactory(tv -> {
             TableRow<Course> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty())) {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Course course = row.getItem();
                     this.primaryStage.setScene(createCourseInfoScene(course));
                 }
@@ -405,7 +628,7 @@ public class GradeTrackerUI {
         return textField;
     }
 
-    private void initProps(TableView tableView) {
+    private void initCourseTableProps(TableView tableView) {
         TableColumn<String, Course> column1 = new TableColumn<>("Course");
         column1.setCellValueFactory(new PropertyValueFactory<>("name"));
 
@@ -433,16 +656,47 @@ public class GradeTrackerUI {
         tableView.sort();
     }
 
+    private Button createAddSessionButton() {
+        Button addSessionButton = new Button("Add Session/Courses");
+        addSessionButton.setOnAction(e -> {
+            this.primaryStage.setScene(createSessionScene());
+        });
+
+        return addSessionButton;
+    }
+
+    private Button createAddTodoButton() {
+        Button addTodoButton = new Button("Add Todo");
+        addTodoButton.setOnAction(e -> {
+            this.primaryStage.setScene(createAddTodoScene(new TodoItem()));
+        });
+
+        return addTodoButton;
+    }
+
     private VBox createInfoDisplay() {
         Button editInfoButton = new Button("Edit Info");
         editInfoButton.setOnAction(e -> {
             this.primaryStage.setScene(createInfoScene(null));
         });
 
-        Button addSessionButton = new Button("Add Session/Courses");
-        addSessionButton.setOnAction(e -> {
-            this.primaryStage.setScene(createSessionScene());
-        });
+        HBox buttons = new HBox(50,
+                createAddSessionButton(),
+                this.student.getAllCourses().size() > 0 ? createAddTodoButton() : EMPTY_BOX
+        );
+        VBox labels = createLabelContainer2();
+
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(labels, editInfoButton, EMPTY_BOX, buttons, createTodoTable());
+
+        vbox.setSpacing(20);
+        vbox.setPadding(new Insets(20));
+
+        return vbox;
+    }
+
+    private VBox createLabelContainer2() {
+        VBox labels = new VBox();
 
         Label nameLabel = new Label(NAME + ": " + this.student.getName());
         Label studentIdLabel = new Label(STUDENT_ID + ": " + this.student.getStudentId());
@@ -453,13 +707,10 @@ public class GradeTrackerUI {
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
-                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel,
-                editInfoButton, EMPTY_BOX, addSessionButton
+                nameLabel, studentIdLabel, csIdLabel, emailLabel, phoneLabel, gpaLabel
         );
 
         vbox.setSpacing(20);
-        vbox.setPadding(new Insets(20));
-
         return vbox;
     }
 
@@ -467,13 +718,14 @@ public class GradeTrackerUI {
         sectionInput = new TextField(course.getSection());
         instructorNameInput = new TextField(course.getInstructor().getName());
         instructorEmailInput = new TextField(course.getInstructor().getEmail());
+        finalGradeInput = new TextField(course.getFinalGrade().mark.toString());
 
         courseComponentContainer = new VBox();
         courseComponentContainer.setSpacing(10);
 
-        for (Map.Entry<String, Integer> component : course.getComponents().entrySet()) {
-            TextField componentInput = new TextField(component.getKey());
-            TextField percentageInput = new TextField(component.getValue().toString());
+        for (CourseComponent component : course.getComponents()) {
+            TextField componentInput = new TextField(component.getName());
+            TextField percentageInput = new TextField(component.getPercentage() + "");
             percentageInput.setPrefWidth(50);
             HBox hbox = new HBox(componentInput, percentageInput, new Label("%"));
             hbox.setSpacing(10);
@@ -500,6 +752,24 @@ public class GradeTrackerUI {
         return removeCourseButton;
     }
 
+    private Button createRemoveTodoItemButton(TodoItem item) {
+        Button removeTodoButton = new Button("Remove Todo");
+        removeTodoButton.setStyle("-fx-background-color: #cf0e00; -fx-text-fill: #fff");
+        removeTodoButton.setOnAction(e -> {
+            String message = "Are you sure?";
+            Alert alert = new Alert(
+                    Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+            );
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.YES) {
+                this.student.removeTodoItem(item);
+                this.primaryStage.setScene(createDashboardScene());
+            }
+        });
+        return removeTodoButton;
+    }
+
     private Button createCourseInfoAddButton() {
         Button addComponentButton = new Button("Add more Component");
         addComponentButton.setOnAction(e -> {
@@ -523,39 +793,71 @@ public class GradeTrackerUI {
                             instructorEmailInput.getText()
                     )
             );
+            course.setFinalGrade(new Grade(Double.parseDouble(finalGradeInput.getText()), 100.0));
             iterateCourseComponents(course);
             this.primaryStage.setScene(createDashboardScene());
         });
         return toDashboardButton;
     }
 
-    private AnchorPane createPieChart(Course course) {
+    private VBox createPieChart(Course course) {
+        AnchorPane anchor = new AnchorPane();
+
+        ArrayList<HBox> bars = new ArrayList<>();
+
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-        for (Map.Entry<String, Integer> component : course.getComponents().entrySet()) {
-            if (!component.getKey().isEmpty() && component.getValue() != 0) {
-                pieChartData.add(new PieChart.Data(component.getKey(), component.getValue()));
+        for (CourseComponent component : course.getComponents()) {
+            if (!component.getName().isEmpty() && component.getPercentage() != 0) {
+                pieChartData.add(new PieChart.Data(component.getName(), component.getPercentage()));
+                bars.add(createProgressContainer(component));
             }
         }
+
+        Label estimatedGradeLabel = new Label("Estimated Grade: "
+                + round(course.getEstimatedGrade(), 1) + "%");
+        estimatedGradeLabel.setFont(new Font(20));
+
         PieChart chart = new PieChart(pieChartData);
         chart.setTitle("Visualization");
         chart.setLabelLineLength(10);
         chart.setLegendSide(Side.BOTTOM);
 
-        AnchorPane anchor = new AnchorPane();
         anchor.getChildren().add(pieChartData.size() > 0 ? chart : EMPTY_BOX);
+        VBox vbox = new VBox(10);
+        vbox.getChildren().addAll(bars);
+        vbox.setAlignment(Pos.CENTER);
 
-        return anchor;
+        return new VBox(20, anchor, vbox, estimatedGradeLabel);
+    }
+
+    private HBox createProgressContainer(CourseComponent component) {
+        Double mark = 0.0;
+        if (component.getMaxMark() > 0.0) {
+            mark = component.getTotalMarkGained() / component.getMaxMark();
+        }
+        ProgressBar progressBar = new ProgressBar(mark);
+        progressBar.setPrefWidth(200);
+        progressBar.setMaxWidth(200);
+        HBox hbox = new HBox(
+                20,
+                new Label(component.getName() + ": "),
+                progressBar,
+                new Label(round(mark * component.getPercentage(), 1)
+                        + " / " + component.getPercentage() + "%")
+        );
+        hbox.setAlignment(Pos.TOP_LEFT);
+        return hbox;
     }
 
     private void iterateCourseComponents(Course course) {
-        HashMap<String, Integer> components = new HashMap<>();
+        Set<CourseComponent> components = new HashSet<>();
         for (Node node1 : courseComponentContainer.getChildren()) {
             HBox container = (HBox) node1;
             String component = "";
             int percentage = 0;
             for (Node node2 : container.getChildren()) {
                 if (node2 instanceof TextField) {
-                    String text = ((TextField)node2).getText();
+                    String text = ((TextField) node2).getText();
                     try {
                         percentage = Integer.parseInt(text);
                     } catch (Exception error) {
@@ -563,10 +865,20 @@ public class GradeTrackerUI {
                     }
                 }
             }
-
             if (!component.isEmpty() && percentage != 0) {
-                components.put(component, percentage);
-                course.setComponents(components);
+                components.add(new CourseComponent(component, percentage));
+            }
+        }
+        transferComponentGrade(course, components);
+        course.setComponents(components);
+    }
+
+    private void transferComponentGrade(Course course, Set<CourseComponent> components) {
+        for (CourseComponent component : components) {
+            CourseComponent oldComponent = course.findComponentByName(component.getName());
+            if (oldComponent != null) {
+                component.setTotalMarkGained(oldComponent.getTotalMarkGained());
+                component.setMaxMark(oldComponent.getMaxMark());
             }
         }
     }
@@ -588,13 +900,5 @@ public class GradeTrackerUI {
                 System.out.println("Error initializing stream");
             }
         }
-    }
-
-    private static HashMap<String, Integer> initEmptyList() {
-        HashMap<String, Integer> map = new HashMap<>();
-        for (int i = 1; i <= 5; i++) {
-            map.put("Example #" + i, 20);
-        }
-        return map;
     }
 }

@@ -78,4 +78,41 @@ end of the screen.
 > encoded and saved in a JSON format .txt file located in data folder whenever the user closes
 > the application. The data will automatically be decoded and proceed to the Dashboard Screen
 > right the way when the user opens the application anytime again after the first time.                                                                                                      
-                                                                                                                                                                                                                                                                                                                                                                     
+
+
+## Phase 4: Task 2
+   - *Test and design a class that is robust*: I design the FileHandler file that has:
+        - method **write()** that throws IOException
+        - method **read()** that  throws IOException and ClassNotFoundException
+        - the two methods above are tested thoroughly in FileHandlerTest, 
+        each has one test for the case where the exception is expected and 
+        another where the exception is not expected
+   - *Include a type hierarchy in your code*: I have the class Instructor and Student both 
+   extends the abstract class Person
+   - *Make appropriate use of the Map interface somewhere in your code*: I implement the 
+   HashMap data structure to store the Course and the Term altogether inside the Session model.
+   - *Make appropriate use of a bi-directional association somewhere in your code*: I have a 
+   bi-directional association in 2 places: 
+        - Course and Session
+        - TodoItem and CourseComponent
+
+
+## Phase 4: Task 3    
+   - Before, the Student and Instructor models did not extend anything and they have 
+   duplicate code for the name and email fields. So I added an abstract Person class that 
+   is the supertype for both Student and Instructor. As a result, I don't have to store the 
+   name and email fields, as well as getters and setters for those fields, individually in 
+   the Instructor or Student model anymore.
+   - I used to have the Term model. The previous structure looks like this:
+        - Student has a list of Sessions
+        - Each Session has a list of Terms
+        - Each Term has a list of Courses
+        - Each Course has a list of CourseComponents
+      
+        but I realized that this structure would make it really hard to retrieve any 
+        information from student because I have to iterate some lists everytime I
+        need something, and the Term doesn't necessarily store a list of Courses.
+        As a result, I removed the Term model and turn it into a simple String. 
+        Along with the use of HashMap and unique course code, I can now associate 
+        any course with a term in a Session without having to iterate through triple 
+        for-loops.                                                                                                                                                                                                                

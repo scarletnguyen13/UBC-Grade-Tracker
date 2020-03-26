@@ -2,9 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents a UBC session such as 2018S, 2019W, etc.
@@ -24,12 +22,12 @@ public class Session implements Serializable {
         this(year, type, new HashMap<>());
     }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
-
     public int getYear() {
         return this.year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public SessionType getType() {
@@ -40,12 +38,12 @@ public class Session implements Serializable {
         this.type = type;
     }
 
-    public void setCourseTermPair(HashMap<Course, String> terms) {
-        this.courseTermPair = terms;
-    }
-
     public HashMap<Course, String> getCourseTermPair() {
         return courseTermPair;
+    }
+
+    public void setCourseTermPair(HashMap<Course, String> terms) {
+        this.courseTermPair = terms;
     }
 
     // MODIFIES: this

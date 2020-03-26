@@ -1,6 +1,9 @@
 package persistance;
 
-import model.*;
+import model.Course;
+import model.Session;
+import model.SessionType;
+import model.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.platform.engine.TestExecutionResult.successful;
 
 public class FileHandlerTest {

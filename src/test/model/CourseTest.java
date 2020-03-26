@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CourseTest {
 
     private Course course;
-    private HashMap<String, Integer> courseComponents;
+    private Set<CourseComponent> courseComponents;
     private String term;
     private Session session;
 
@@ -25,10 +27,10 @@ public class CourseTest {
 
         session = new Session(2013, SessionType.WINTER_SESSION, courses);
 
-        courseComponents = new HashMap<>();
-        courseComponents.put("Homework", 20);
-        courseComponents.put("Quizzes", 30);
-        courseComponents.put("Exams", 50);
+        courseComponents = new HashSet<>();
+        courseComponents.add(new CourseComponent("Homework", 20));
+        courseComponents.add(new CourseComponent("Quizzes", 30));
+        courseComponents.add(new CourseComponent("Exams", 50));
     }
 
     @Test
@@ -40,11 +42,16 @@ public class CourseTest {
         assertEquals("L56", course.getSection());
         assertEquals(new Instructor("Dirk"), course.getInstructor());
         assertEquals(courseComponents, course.getComponents());
+        assertEquals(0.0, course.getFinalGrade().mark);
+        assertEquals(100.0, course.getFinalGrade().outOf);
 
         course.setTerm(term);
         course.setSession(session);
+        course.setFinalGrade(new Grade(100.0, 100.0));
         assertEquals(term, course.getTerm());
         assertEquals(session, course.getSession());
+        assertEquals(100.0, course.getFinalGrade().mark);
+        assertEquals(100.0, course.getFinalGrade().outOf);
     }
 
     @Test
@@ -54,7 +61,7 @@ public class CourseTest {
         assertEquals("CPSC 210", course.getName());
         assertEquals("L13", course.getSection());
         assertEquals(new Instructor(), course.getInstructor());
-        assertEquals(new HashMap<>(), course.getComponents());
+        assertEquals(new HashSet<>(), course.getComponents());
     }
 
     @Test
@@ -111,5 +118,46 @@ public class CourseTest {
         assertFalse(course.equals(new Instructor("Dirk")));
         assertFalse(course.equals(null));
         assertFalse(course.equals(new Course("ECON110", "L53")));
+    }
+
+    @Test
+    void testFindComponentByName() {
+        course = new Course("CPSC 210", courseComponents, term, session);
+
+        CourseComponent foundComponent = course.findComponentByName("Homework");
+        assertEquals("Homework", foundComponent.getName());
+        assertEquals(20, foundComponent.getPercentage());
+
+        CourseComponent notFoundComponent = course.findComponentByName("homework");
+        assertEquals(null, notFoundComponent);
+    }
+
+    @Test
+    void testEstimatedGrade() {
+        CourseComponent component1 = new CourseComponent("Homework", 20);
+        component1.setTotalMarkGained(25);
+        component1.setMaxMark(40);
+
+        CourseComponent component2 = new CourseComponent("Quizzes", 30);
+        component2.setTotalMarkGained(30);
+        component2.setMaxMark(50);
+
+        CourseComponent component3 = new CourseComponent("Exams", 50);
+        component3.setTotalMarkGained(80);
+        component3.setMaxMark(100);
+
+        courseComponents = new HashSet<>();
+        courseComponents.add(component1);
+        courseComponents.add(component2);
+        courseComponents.add(component3);
+
+        course = new Course("CPSC 210", courseComponents, term, session);
+        double expectedResult = (25.0 / 40.0 * 20.0) + (30.0 / 50.0 * 30.0) + (80.0 / 100.0 * 50.0);
+        assertEquals(expectedResult, course.getEstimatedGrade());
+
+        component1.setPercentage(0);
+        component2.setPercentage(0);
+        component3.setPercentage(0);
+        assertEquals(0.0, course.getEstimatedGrade());
     }
 }
