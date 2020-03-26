@@ -13,14 +13,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        CourseInfoScene courseInfoScene = new CourseInfoScene(primaryStage);
         DashboardScene dashboardScene = new DashboardScene(primaryStage);
         StudentInfoScene studentInfoScene = new StudentInfoScene(primaryStage);
         SessionScene sessionScene = new SessionScene(primaryStage);
-        TodoItemScene todoItemScene = new TodoItemScene(primaryStage);
-        ui = new GradeTrackerUI(
-                primaryStage, courseInfoScene, dashboardScene, studentInfoScene, sessionScene, todoItemScene
-        );
+        ui = new GradeTrackerUI(primaryStage, dashboardScene, studentInfoScene, sessionScene);
     }
 
     @Override

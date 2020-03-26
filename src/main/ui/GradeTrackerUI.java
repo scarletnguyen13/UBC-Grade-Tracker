@@ -35,20 +35,9 @@ public class GradeTrackerUI {
     private Student student;
     private FileHandler fileHandler;
 
-    private MyScene courseInfoScene;
-    private MyScene dashboardScene;
-    private MyScene studentInfoScene;
-    private MyScene sessionScene;
-    private MyScene todoItemScene;
-
-    public GradeTrackerUI(Stage primaryStage, CourseInfoScene courseInfoScene, DashboardScene dashboardScene,
-                          StudentInfoScene studentInfoScene, SessionScene sessionScene, TodoItemScene todoItemScene) {
+    public GradeTrackerUI(Stage primaryStage, DashboardScene dashboardScene,
+                          StudentInfoScene studentInfoScene, SessionScene sessionScene) {
         this.primaryStage = primaryStage;
-        this.courseInfoScene = courseInfoScene;
-        this.dashboardScene = dashboardScene;
-        this.studentInfoScene = studentInfoScene;
-        this.sessionScene = sessionScene;
-        this.todoItemScene = todoItemScene;
 
         fileHandler = new FileHandler();
         try {

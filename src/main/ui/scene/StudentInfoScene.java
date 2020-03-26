@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -29,7 +30,8 @@ public class StudentInfoScene extends MyScene {
 
     public void initScene(Student student, Scene nextScene) {
         this.student = student;
-        VBox vbox = new VBox();
+        VBox vbox = new VBox(40);
+        vbox.setPadding(new Insets(20));
         ListView list = new ListView();
         VBox.setVgrow(list, Priority.ALWAYS);
 
@@ -54,10 +56,10 @@ public class StudentInfoScene extends MyScene {
         gpaBox.getChildren().add(gpaTextField);
 
         Button toSessionSceneButton = createInfoSubmitButton(nextScene);
+        HBox buttonContainer = createCancelButtonContainer();
+        buttonContainer.getChildren().add(toSessionSceneButton);
 
-        vbox.getChildren().addAll(nameBox, studentIdBox, csIdBox, emailBox, phoneBox, gpaBox, toSessionSceneButton);
-        vbox.setSpacing(40);
-        vbox.setPadding(new Insets(20));
+        vbox.getChildren().addAll(nameBox, studentIdBox, csIdBox, emailBox, phoneBox, gpaBox, buttonContainer);
 
         this.scene = new Scene(vbox);
     }
