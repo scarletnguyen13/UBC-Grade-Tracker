@@ -293,9 +293,9 @@ public class GradeTrackerUI {
             } else {
                 this.student.addTodoItem(new TodoItem(description, coursePair, deadline, grade, completed));
             }
-
             component.setTotalMarkGained(currentMark);
             component.setMaxMark(currentMax);
+
             primaryStage.setScene(createDashboardScene());
         } else {
             throwFillOutAlert();
@@ -505,10 +505,12 @@ public class GradeTrackerUI {
         return yearComboBox;
     }
 
-    private TableView createTodoTable() {
+    private VBox createTodoTable() {
         TableView tableView = new TableView();
+
         ObservableList<TodoItem> data = FXCollections.observableArrayList(this.student.getTodoList());
-        SortedList<TodoItem> sortableData = new SortedList<>(data);
+        FilteredList<TodoItem> filteredData = new FilteredList<>(data, c -> !c.isCompleted());
+        SortedList<TodoItem> sortableData = new SortedList<>(filteredData);
         tableView.setItems(sortableData);
         sortableData.comparatorProperty().bind(tableView.comparatorProperty());
 
@@ -526,7 +528,25 @@ public class GradeTrackerUI {
             return row;
         });
 
-        return tableView;
+        return new VBox(20, createTodoChoiceBox(filteredData), tableView);
+    }
+
+    private ChoiceBox<String> createTodoChoiceBox(FilteredList<TodoItem> flItem) {
+        ChoiceBox<String> choiceBox = new ChoiceBox();
+        choiceBox.getItems().addAll("All", "Todo", "Completed");
+        choiceBox.setValue("Todo");
+
+        choiceBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            if (newValue.equals("All")) {
+                flItem.setPredicate(c -> true);
+            } else if (newValue.equals("Todo")) {
+                flItem.setPredicate(c -> !c.isCompleted());
+            } else {
+                flItem.setPredicate(c -> c.isCompleted());
+            }
+        });
+
+        return choiceBox;
     }
 
     private void initTodoTableProps(TableView tableView) {
@@ -687,7 +707,9 @@ public class GradeTrackerUI {
         VBox labels = createLabelContainer2();
 
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(labels, editInfoButton, EMPTY_BOX, buttons, createTodoTable());
+        vbox.getChildren().addAll(
+                labels, editInfoButton, EMPTY_BOX, buttons, createTodoTable()
+        );
 
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));

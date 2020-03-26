@@ -131,7 +131,9 @@ public class Course implements Serializable {
             if (component.getMaxMark() != 0.0) {
                 gradeAchieved += component.getTotalMarkGained() / component.getMaxMark() * component.getPercentage();
             }
-            overallGrade += component.getPercentage();
+            if (component.getTotalMarkGained() != 0.0) {
+                overallGrade += component.getPercentage();
+            }
         }
         if (overallGrade != 0.0) {
             return gradeAchieved / overallGrade * 100.0;
