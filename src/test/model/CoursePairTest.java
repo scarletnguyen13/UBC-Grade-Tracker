@@ -27,5 +27,11 @@ public class CoursePairTest {
 
         coursePair = new CoursePair(null, null);
         assertTrue(coursePair.isEmpty());
+
+        coursePair = new CoursePair(course, null);
+        assertFalse(coursePair.isEmpty());
+
+        coursePair = new CoursePair(null, component);
+        assertFalse(coursePair.isEmpty());
     }
 }

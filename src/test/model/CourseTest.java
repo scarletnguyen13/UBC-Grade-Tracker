@@ -160,6 +160,11 @@ public class CourseTest {
         component3.setMaxMark(0);
         assertEquals(0.0, course.getEstimatedGrade());
 
+        component1.setTotalMarkGained(0);
+        component2.setTotalMarkGained(0);
+        component3.setTotalMarkGained(0);
+        assertEquals(0.0, course.getEstimatedGrade());
+
         component1.setPercentage(0);
         component2.setPercentage(0);
         component3.setPercentage(0);
