@@ -2,7 +2,9 @@ package ui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import ui.scene.*;
+import ui.scene.DashboardScene;
+import ui.scene.SessionScene;
+import ui.scene.StudentInfoScene;
 
 public class Main extends Application {
     private GradeTrackerUI ui;

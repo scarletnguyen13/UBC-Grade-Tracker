@@ -115,6 +115,7 @@ public class Course implements Serializable {
         return Objects.hash(name);
     }
 
+    // EFFECTS: returns the component given its name, null if not found
     public CourseComponent findComponentByName(String name) {
         for (CourseComponent component : this.getComponents()) {
             if (name.equals(component.getName())) {
@@ -124,6 +125,7 @@ public class Course implements Serializable {
         return null;
     }
 
+    // EFFECTS: return the estimated overall grade so far in this course
     public double getEstimatedGrade() {
         double gradeAchieved = 0.0;
         double overallGrade = 0.0;

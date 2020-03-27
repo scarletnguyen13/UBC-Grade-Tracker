@@ -9,7 +9,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -17,8 +19,6 @@ import model.Course;
 import model.Session;
 import model.Student;
 import model.TodoItem;
-
-import static ui.GradeTrackerUI.*;
 
 public class DashboardScene extends MyScene {
     public DashboardScene(Stage primaryStage) {

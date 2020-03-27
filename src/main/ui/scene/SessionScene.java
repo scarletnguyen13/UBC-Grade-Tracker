@@ -3,7 +3,6 @@ package ui.scene;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,13 +15,18 @@ import model.*;
 
 import java.util.*;
 
-import static ui.GradeTrackerUI.*;
-
 public class SessionScene extends MyScene {
     private static final String[] SEASONS = {
             "Winter", "Winter", "Spring", "Spring", "Summer", "Summer",
             "Summer", "Summer", "Fall", "Fall", "Winter", "Winter"
     };
+
+    private static final String SUMMER = "Summer";
+    private static final String WINTER = "Winter";
+    private static final String TERM_1 = "Term 1";
+    private static final String TERM_2 = "Term 2";
+    private static final String SUMMER_TERM = "Summer Term";
+
     private ComboBox yearComboBox;
     private ComboBox sessionComboBox;
     private ComboBox termComboBox;
@@ -171,17 +175,5 @@ public class SessionScene extends MyScene {
         comboBox.getItems().addAll(options);
         comboBox.setValue(defaultValue);
         return comboBox;
-    }
-
-    public HBox createCancelButtonContainer() {
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> {
-            DashboardScene scene = new DashboardScene(primaryStage);
-            scene.initScene(student);
-            primaryStage.setScene(scene.getScene());
-        });
-        HBox hbox = new HBox(20, cancelButton);
-        hbox.setAlignment(Pos.CENTER_LEFT);
-        return hbox;
     }
 }

@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static ui.GradeTrackerUI.EMPTY_BOX;
-import static ui.GradeTrackerUI.SUBMIT;
-
 public class CourseInfoScene extends MyScene {
     private Label sectionLabel;
     private Label instructorNameLabel;

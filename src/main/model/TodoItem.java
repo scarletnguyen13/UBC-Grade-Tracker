@@ -70,6 +70,8 @@ public class TodoItem implements Serializable, Comparable<TodoItem> {
         isCompleted = completed;
     }
 
+    // MODIFIES: this
+    // EFFECTS: set multiple fields at the same time
     public void setProps(
             String description, CoursePair coursePair, LocalDate deadline, Grade grade, boolean isCompleted
     ) {

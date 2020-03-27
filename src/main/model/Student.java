@@ -115,6 +115,9 @@ public class Student extends Person {
         this.todoList.add(item);
     }
 
+    // MODIFIES: this, component
+    // EFFECTS: remove the item from the todolist
+    // and reduce the total marked gain and max mark in associated course's component
     public void removeTodoItem(TodoItem item) {
         CourseComponent component = item.getCoursePair().component;
         if (component != null) {

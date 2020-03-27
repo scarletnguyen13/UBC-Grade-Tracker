@@ -14,8 +14,6 @@ import javafx.stage.Stage;
 import model.Student;
 import ui.GradeTrackerUI;
 
-import static ui.GradeTrackerUI.*;
-
 public class StudentInfoScene extends MyScene {
     private TextField nameTextField;
     private TextField studentIdTextField;

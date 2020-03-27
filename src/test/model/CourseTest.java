@@ -155,6 +155,11 @@ public class CourseTest {
         double expectedResult = (25.0 / 40.0 * 20.0) + (30.0 / 50.0 * 30.0) + (80.0 / 100.0 * 50.0);
         assertEquals(expectedResult, course.getEstimatedGrade());
 
+        component1.setMaxMark(0);
+        component2.setMaxMark(0);
+        component3.setMaxMark(0);
+        assertEquals(0.0, course.getEstimatedGrade());
+
         component1.setPercentage(0);
         component2.setPercentage(0);
         component3.setPercentage(0);

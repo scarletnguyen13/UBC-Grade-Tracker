@@ -94,8 +94,7 @@ end of the screen.
    HashMap data structure to store the Course and the Term altogether inside the Session model.
    - *Make appropriate use of a bi-directional association somewhere in your code*: I have a 
    bi-directional association in 2 places: 
-        - Course and Session
-        - TodoItem and CourseComponent
+        - Session and Course: one-many relationship 
 
 
 ## Phase 4: Task 3    

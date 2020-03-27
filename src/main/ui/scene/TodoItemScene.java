@@ -3,7 +3,6 @@ package ui.scene;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -15,7 +14,7 @@ import model.*;
 import java.time.LocalDate;
 import java.util.Calendar;
 
-import static ui.GradeTrackerUI.*;
+import static ui.GradeTrackerUI.throwFillOutAlert;
 
 public class TodoItemScene extends MyScene {
     private TextField descriptionInput;
@@ -177,17 +176,5 @@ public class TodoItemScene extends MyScene {
             grade = new Grade(0.0, 0.0);
         }
         return grade;
-    }
-
-    public HBox createCancelButtonContainer() {
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> {
-            DashboardScene scene = new DashboardScene(primaryStage);
-            scene.initScene(student);
-            primaryStage.setScene(scene.getScene());
-        });
-        HBox hbox = new HBox(20, cancelButton);
-        hbox.setAlignment(Pos.CENTER_LEFT);
-        return hbox;
     }
 }
