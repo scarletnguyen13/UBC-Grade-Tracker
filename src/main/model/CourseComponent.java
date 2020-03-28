@@ -8,22 +8,22 @@ import java.util.Comparator;
  */
 public class CourseComponent implements Serializable, Comparable<CourseComponent> {
     private String name;
-    private int percentage;
+    private double percentage;
     private double totalMarkGained;
     private double maxMark;
 
-    public CourseComponent(String name, int percentage) {
+    public CourseComponent(String name, double percentage) {
         this.name = name;
         this.percentage = percentage;
         this.totalMarkGained = 0.0;
         this.maxMark = 0.0;
     }
 
-    public int getPercentage() {
+    public double getPercentage() {
         return percentage;
     }
 
-    public void setPercentage(int percentage) {
+    public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
 

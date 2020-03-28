@@ -133,6 +133,22 @@ class StudentTest {
     }
 
     @Test
+    void testRemoveSession() {
+        assertEquals(2, this.student.getSessions().size());
+        assertEquals(new Session(), this.student.getCurrentSession());
+        this.student.setCurrentSession(session1);
+        assertEquals(session1, this.student.getCurrentSession());
+
+        student.removeSession(session1);
+        assertEquals(1, this.student.getSessions().size());
+        assertEquals(session2, this.student.getCurrentSession());
+
+        student.removeSession(session2);
+        assertEquals(0, this.student.getSessions().size());
+        assertEquals(new Session(), this.student.getCurrentSession());
+    }
+
+    @Test
     void testToString() {
         String expectedResult = "Name: " + this.student.getName() + "\n"
                 + "Student ID: " + this.student.getStudentId() + "\n"

@@ -21,6 +21,9 @@ import model.Student;
 import model.TodoItem;
 
 public class DashboardScene extends MyScene {
+    private FilteredList<Course> filteredCourse;
+    private FilteredList<TodoItem> filteredItem;
+
     public DashboardScene(Stage primaryStage) {
         super(primaryStage);
     }
@@ -32,27 +35,43 @@ public class DashboardScene extends MyScene {
         this.scene = new Scene(pane);
     }
 
+    private void initCourseList() {
+        ObservableList<Course> data = FXCollections.observableArrayList(this.student.getAllCourses());
+        this.filteredCourse = new FilteredList<>(data, c -> c.getSession().equals(this.student.getCurrentSession()));
+    }
+
+    private void initTodoList() {
+        ObservableList<TodoItem> data = FXCollections.observableArrayList(this.student.getTodoList());
+        filteredItem = new FilteredList<>(data, c -> isItemInSession(c));
+    }
+
+    private boolean isItemInSession(TodoItem item) {
+        return this.student.getCurrentSession().getCourseTermPair().containsKey(item.getCoursePair().course);
+    }
+
     private VBox createInfoDisplay() {
         Button editInfoButton = new Button("Edit Info");
         editInfoButton.setOnAction(e -> {
             StudentInfoScene studentInfoScene = new StudentInfoScene(primaryStage);
-            studentInfoScene.initScene(student, null);
+            studentInfoScene.initScene(this.student, null);
             this.primaryStage.setScene(studentInfoScene.getScene());
         });
-
         HBox buttons = new HBox(40,
                 editInfoButton,
                 createAddSessionButton(),
                 this.student.getAllCourses().size() > 0 ? createAddTodoButton() : EMPTY_BOX
         );
+        HBox currentSessionContainer = new HBox(
+                20, new Label("Current Session:"), createCurrentSessionChoiceBox()
+        );
+        currentSessionContainer.setAlignment(Pos.CENTER_LEFT);
         buttons.setAlignment(Pos.CENTER);
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
-                createLabelContainer(), buttons, EMPTY_BOX, createTodoTable()
+                currentSessionContainer, createLabelContainer(), buttons, EMPTY_BOX, createTodoTable()
         );
         vbox.setSpacing(20);
         vbox.setPadding(new Insets(20));
-
         return vbox;
     }
 
@@ -69,9 +88,7 @@ public class DashboardScene extends MyScene {
 
     private VBox createCourseTable() {
         TableView tableView = new TableView();
-        ObservableList<Course> data = FXCollections.observableArrayList(this.student.getAllCourses());
-        FilteredList<Course> filteredData = new FilteredList(data, c -> true); //Pass the data to a filtered list
-        SortedList<Course> sortableData = new SortedList<>(filteredData);
+        SortedList<Course> sortableData = new SortedList<>(filteredCourse);
         tableView.setItems(sortableData);
         sortableData.comparatorProperty().bind(tableView.comparatorProperty());
 
@@ -89,7 +106,7 @@ public class DashboardScene extends MyScene {
             return row;
         });
 
-        VBox vbox = new VBox(createSearchContainer(filteredData), tableView);
+        VBox vbox = new VBox(createSearchContainer(), tableView);
         VBox.setVgrow(tableView, Priority.ALWAYS);
 
         return vbox;
@@ -161,14 +178,14 @@ public class DashboardScene extends MyScene {
         return label;
     }
 
-    private HBox createSearchContainer(FilteredList<Course> filteredData) {
+    private HBox createSearchContainer() {
         ChoiceBox<String> choiceBox = createSearchChoiceBox();
-        TextField textField = createSearchTextField(choiceBox, filteredData);
+        TextField textField = createSearchTextField(choiceBox);
 
         choiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 textField.setText("");
-                filteredData.setPredicate(null);
+                filteredCourse.setPredicate(c -> this.student.getCurrentSession().getCourseTermPair().containsKey(c));
             }
         });
         HBox hbox = new HBox(5, choiceBox, textField);
@@ -184,18 +201,18 @@ public class DashboardScene extends MyScene {
         return choiceBox;
     }
 
-    private TextField createSearchTextField(ChoiceBox<String> choiceBox, FilteredList<Course> flCourse) {
+    private TextField createSearchTextField(ChoiceBox<String> choiceBox) {
         TextField textField = new TextField();
         textField.setPromptText("Search...");
 
         textField.setOnKeyReleased(keyEvent -> {
             switch (choiceBox.getValue()) {
                 case "Course":
-                    flCourse.setPredicate(c -> c.getName().toLowerCase()
+                    filteredCourse.setPredicate(c -> c.getName().toLowerCase()
                             .contains(textField.getText().toLowerCase().trim()));
                     break;
                 case "Session":
-                    flCourse.setPredicate(c -> c.getSession().toString().toLowerCase()
+                    filteredCourse.setPredicate(c -> c.getSession().toString().toLowerCase()
                             .contains(textField.getText().toLowerCase().trim()));
                     break;
             }
@@ -205,11 +222,10 @@ public class DashboardScene extends MyScene {
     }
 
     private VBox createTodoTable() {
-        TableView tableView = new TableView();
+        initTodoList();
 
-        ObservableList<TodoItem> data = FXCollections.observableArrayList(this.student.getTodoList());
-        FilteredList<TodoItem> filteredData = new FilteredList(data, c -> true);
-        SortedList<TodoItem> sortableData = new SortedList<>(filteredData);
+        TableView tableView = new TableView();
+        SortedList<TodoItem> sortableData = new SortedList<>(filteredItem);
         tableView.setItems(sortableData);
         sortableData.comparatorProperty().bind(tableView.comparatorProperty());
 
@@ -229,7 +245,7 @@ public class DashboardScene extends MyScene {
             return row;
         });
 
-        VBox vbox = new VBox(10, createTodoChoiceBox(filteredData), tableView);
+        VBox vbox = new VBox(10, createTodoChoiceBox(), tableView);
         vbox.setAlignment(Pos.CENTER_RIGHT);
         return vbox;
     }
@@ -263,19 +279,35 @@ public class DashboardScene extends MyScene {
         tableView.setPlaceholder(new Label("Todo list is empty"));
     }
 
-    private ChoiceBox<String> createTodoChoiceBox(FilteredList<TodoItem> flItem) {
+    private ChoiceBox<String> createTodoChoiceBox() {
         ChoiceBox<String> choiceBox = new ChoiceBox();
         choiceBox.getItems().addAll("All", "Todo", "Completed");
         choiceBox.setValue("All");
 
         choiceBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             if (newValue.equals("All")) {
-                flItem.setPredicate(c -> true);
+                filteredItem.setPredicate(c -> true && isItemInSession(c));
             } else if (newValue.equals("Todo")) {
-                flItem.setPredicate(c -> !c.isCompleted());
+                filteredItem.setPredicate(c -> !c.isCompleted() && isItemInSession(c));
             } else {
-                flItem.setPredicate(c -> c.isCompleted());
+                filteredItem.setPredicate(c -> c.isCompleted() && isItemInSession(c));
             }
+        });
+
+        return choiceBox;
+    }
+
+    private ChoiceBox<Session> createCurrentSessionChoiceBox() {
+        initCourseList();
+
+        ChoiceBox<Session> choiceBox = new ChoiceBox();
+        choiceBox.getItems().addAll(this.student.getSortedSessions());
+        choiceBox.setValue(this.student.getCurrentSession());
+
+        choiceBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            this.student.setCurrentSession(newValue);
+            filteredCourse.setPredicate(c -> c.getSession().equals(newValue));
+            filteredItem.setPredicate(c -> newValue.getCourseTermPair().containsKey(c.getCoursePair().course));
         });
 
         return choiceBox;

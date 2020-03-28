@@ -1,13 +1,14 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
 
 /**
  * Represents a UBC session such as 2018S, 2019W, etc.
  */
-public class Session implements Serializable {
+public class Session implements Serializable, Comparable<Session> {
     private int year;
     private SessionType type;
     private HashMap<Course, String> courseTermPair;
@@ -20,6 +21,14 @@ public class Session implements Serializable {
 
     public Session(int year, SessionType type) {
         this(year, type, new HashMap<>());
+    }
+
+    public Session() {
+        this(0, SessionType.SUMMER_SESSION);
+    }
+
+    public boolean isEmpty() {
+        return this.year == 0;
     }
 
     public int getYear() {
@@ -47,13 +56,13 @@ public class Session implements Serializable {
     }
 
     // MODIFIES: this
-    // EFFECTS:  adds the given term to the current term list
+    // EFFECTS:  adds the given course to the current course list
     public void addPair(Course course, String term) {
         this.courseTermPair.put(course, term);
     }
 
     // MODIFIES: this
-    // EFFECTS:  removes the given term from the current term list
+    // EFFECTS:  removes the given course from the current course list
     public void removeCourse(Course course) {
         this.courseTermPair.remove(course);
     }
@@ -80,5 +89,12 @@ public class Session implements Serializable {
     public String toString() {
         String type = this.type == SessionType.SUMMER_SESSION ? "S" : "W";
         return year + "" + type;
+    }
+
+    @Override
+    public int compareTo(Session other) {
+        return Comparator
+                .comparing(Session::toString, Comparator.nullsFirst(Comparator.reverseOrder()))
+                .compare(this, other);
     }
 }

@@ -74,6 +74,7 @@ public class CourseInfoScene extends MyScene {
         instructorNameInput = new TextField(course.getInstructor().getName());
         instructorEmailInput = new TextField(course.getInstructor().getEmail());
         finalGradeInput = new TextField(course.getFinalGrade().mark.toString());
+        initAsDecimalTextField(finalGradeInput);
 
         courseComponentContainer = new VBox();
         courseComponentContainer.setSpacing(10);
@@ -81,6 +82,7 @@ public class CourseInfoScene extends MyScene {
         for (CourseComponent component : course.getComponents()) {
             TextField componentInput = new TextField(component.getName());
             TextField percentageInput = new TextField(component.getPercentage() + "");
+            initAsDecimalTextField(percentageInput);
             percentageInput.setPrefWidth(50);
             HBox hbox = new HBox(componentInput, percentageInput, new Label("%"));
             hbox.setSpacing(10);
@@ -126,12 +128,12 @@ public class CourseInfoScene extends MyScene {
         for (Node node1 : courseComponentContainer.getChildren()) {
             HBox container = (HBox) node1;
             String component = "";
-            int percentage = 0;
+            double percentage = 0.0;
             for (Node node2 : container.getChildren()) {
                 if (node2 instanceof TextField) {
                     String text = ((TextField) node2).getText();
                     try {
-                        percentage = Integer.parseInt(text);
+                        percentage = Double.parseDouble(text);
                     } catch (Exception error) {
                         component = text;
                     }
@@ -168,6 +170,9 @@ public class CourseInfoScene extends MyScene {
             if (alert.getResult() == ButtonType.YES) {
                 Session s = course.getSession();
                 s.removeCourse(course);
+                if (s.getCourseTermPair().size() < 1) {
+                    this.student.removeSession(s);
+                }
 
                 DashboardScene scene = new DashboardScene(primaryStage);
                 scene.initScene(student);
@@ -184,7 +189,7 @@ public class CourseInfoScene extends MyScene {
 
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (CourseComponent component : course.getComponents()) {
-            if (!component.getName().isEmpty() && component.getPercentage() != 0) {
+            if (!component.getName().isEmpty() && component.getPercentage() != 0.0) {
                 pieChartData.add(new PieChart.Data(component.getName(), component.getPercentage()));
                 bars.add(createProgressContainer(component));
             }

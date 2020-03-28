@@ -68,6 +68,7 @@ public class StudentInfoScene extends MyScene {
 
         studentIdTextField = new TextField();
         studentIdTextField.setText(student.getStudentId());
+        initAsDecimalTextField(studentIdTextField);
 
         csIdTextField = new TextField();
         csIdTextField.setText(this.student.getCsId());
@@ -80,6 +81,7 @@ public class StudentInfoScene extends MyScene {
 
         gpaTextField = new TextField();
         gpaTextField.setText(this.student.getGpa());
+        initAsDecimalTextField(gpaTextField);
     }
 
     private Button createInfoSubmitButton(Scene nextScene) {

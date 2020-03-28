@@ -1,8 +1,6 @@
 package model;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Represents a UBC student - also the main user of the app.
@@ -13,6 +11,7 @@ public class Student extends Person {
     private String phone;
 
     private String gpa;
+    private Session currentSession;
     private Set<Session> sessions;
     private Set<TodoItem> todoList;
 
@@ -25,6 +24,7 @@ public class Student extends Person {
         this.gpa = gpa;
         this.sessions = sessions;
         this.todoList = todoList;
+        this.currentSession = new Session();
     }
 
     public Student(String name, String studentId, Set<Session> sessions) {
@@ -68,11 +68,17 @@ public class Student extends Person {
     }
 
     public Set<Session> getSessions() {
-        return sessions;
+        return this.sessions;
     }
 
     public void setSessions(Set<Session> sessions) {
         this.sessions = sessions;
+    }
+
+    public List<Session> getSortedSessions() {
+        List<Session> sortedList = new ArrayList<>(this.sessions);
+        Collections.sort(sortedList);
+        return sortedList;
     }
 
     public Set<TodoItem> getTodoList() {
@@ -81,6 +87,14 @@ public class Student extends Person {
 
     public void setTodoList(Set<TodoItem> todoList) {
         this.todoList = todoList;
+    }
+
+    public Session getCurrentSession() {
+        return currentSession;
+    }
+
+    public void setCurrentSession(Session currentSession) {
+        this.currentSession = currentSession;
     }
 
     // EFFECTS: returns all the courses the student is taking / has taken so far in UBC
@@ -106,7 +120,23 @@ public class Student extends Person {
     // MODIFIES: this
     // EFFECTS: add the session to the list of sessions
     public void addSession(Session session) {
-        this.sessions.add(session);
+        if (session.getCourseTermPair().size() > 0) {
+            this.sessions.add(session);
+        }
+        if (this.currentSession.isEmpty()) {
+            this.currentSession = session;
+        }
+    }
+
+    public void removeSession(Session session) {
+        this.sessions.remove(session);
+        if (this.currentSession.equals(session)) {
+            if (this.getSortedSessions().size() > 0) {
+                this.currentSession = this.getSortedSessions().get(0);
+            } else {
+                this.currentSession = new Session();
+            }
+        }
     }
 
     // MODIFIES: this

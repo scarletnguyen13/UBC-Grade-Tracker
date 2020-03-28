@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,5 +111,29 @@ public class SessionTest {
         assertFalse(session.equals("Term 1"));
         assertFalse(session.equals(new Session(2012, SessionType.WINTER_SESSION, terms)));
         assertFalse(session.equals(new Session(2013, SessionType.SUMMER_SESSION, terms)));
+    }
+
+    @Test
+    void testCompareTo() {
+        Session session1 = new Session(2019, SessionType.WINTER_SESSION);
+        Session session1_5 = new Session(2019, SessionType.SUMMER_SESSION);
+        Session session2 = new Session(2018, SessionType.WINTER_SESSION);
+        Session session3 = new Session(2017, SessionType.SUMMER_SESSION);
+
+        Session[] list1 = {session1, session1_5, session2, session3};
+        Session[] list2 = {session3, session1_5, session2, session1};
+
+        // assertion pass
+        Arrays.sort(list2);
+        assertArrayEquals(list1, list2);
+    }
+
+    @Test
+    void testEmpty() {
+        session = new Session(2013, SessionType.WINTER_SESSION, terms);
+        assertFalse(session.isEmpty());
+
+        session = new Session();
+        assertTrue(session.isEmpty());
     }
 }

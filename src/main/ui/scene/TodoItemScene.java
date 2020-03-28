@@ -66,7 +66,9 @@ public class TodoItemScene extends MyScene {
         initCourseComboBox(item.getCoursePair().course);
         initComponentComboBox(item.getCoursePair());
         markInput = new TextField(item.getGrade().mark.toString());
+        initAsDecimalTextField(markInput);
         outOfInput = new TextField(item.getGrade().outOf.toString());
+        initAsDecimalTextField(outOfInput);
         isCompleted = new CheckBox("Is Completed?");
         isCompleted.setSelected(item.isCompleted());
     }

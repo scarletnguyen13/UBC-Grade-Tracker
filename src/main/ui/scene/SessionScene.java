@@ -21,6 +21,13 @@ public class SessionScene extends MyScene {
             "Summer", "Summer", "Fall", "Fall", "Winter", "Winter"
     };
 
+    private static final Set<CourseComponent> DEFAULT_COMPONENTS = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(
+                    new CourseComponent("Homework", 20),
+                    new CourseComponent("Quizzes", 30),
+                    new CourseComponent("Exam", 50)
+            )));
+
     private static final String SUMMER = "Summer";
     private static final String WINTER = "Winter";
     private static final String TERM_1 = "Term 1";
@@ -34,14 +41,6 @@ public class SessionScene extends MyScene {
 
     public SessionScene(Stage primaryStage) {
         super(primaryStage);
-    }
-
-    private static Set<CourseComponent> initSampleComponentList() {
-        Set<CourseComponent> components = new TreeSet<>();
-        components.add(new CourseComponent("Homework", 20));
-        components.add(new CourseComponent("Quizzes", 30));
-        components.add(new CourseComponent("Exam", 50));
-        return components;
     }
 
     public void initScene(Student student) {
@@ -95,27 +94,20 @@ public class SessionScene extends MyScene {
 
     private Button createSessionSubmitButton() {
         Button submitButton = new Button(SUBMIT);
-
         submitButton.setOnAction(e -> {
             String term = termComboBox.getValue().toString();
             SessionType type = sessionComboBox.getValue().toString().equals(SUMMER) ? SessionType.SUMMER_SESSION
                     : SessionType.WINTER_SESSION;
-
             Session currentSession = student.findSession(Integer.parseInt(yearComboBox.getValue().toString()), type);
-            this.student.addSession(currentSession);
-
             for (Node node : courseTextFieldContainer.getChildren()) {
                 String courseName = ((TextField) node).getText();
                 if (!courseName.isEmpty()) {
-                    currentSession.addPair(
-                            new Course(courseName, initSampleComponentList(), term, currentSession),
-                            term
-                    );
+                    currentSession.addPair(new Course(courseName, DEFAULT_COMPONENTS, term, currentSession), term);
                 }
             }
-
+            this.student.addSession(currentSession);
             DashboardScene scene = new DashboardScene(primaryStage);
-            scene.initScene(student);
+            scene.initScene(this.student);
             this.primaryStage.setScene(scene.getScene());
         });
         return submitButton;
