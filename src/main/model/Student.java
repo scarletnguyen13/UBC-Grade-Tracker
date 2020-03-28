@@ -122,12 +122,15 @@ public class Student extends Person {
     public void addSession(Session session) {
         if (session.getCourseTermPair().size() > 0) {
             this.sessions.add(session);
-        }
-        if (this.currentSession.isEmpty()) {
-            this.currentSession = session;
+            if (this.currentSession.isEmpty()) {
+                this.currentSession = session;
+            }
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: remove the session from the list of sessions and replace the current session with another
+    // session if the session being removed is the current one
     public void removeSession(Session session) {
         this.sessions.remove(session);
         if (this.currentSession.equals(session)) {

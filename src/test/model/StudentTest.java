@@ -130,16 +130,30 @@ class StudentTest {
         assertEquals(3, this.student.getSessions().size());
         this.student.addSession(new Session(2020, SessionType.WINTER_SESSION, summerCourses));
         assertEquals(3, this.student.getSessions().size());
+
+        this.student.setSessions(new HashSet<>());
+        this.student.addSession(new Session(2020, SessionType.WINTER_SESSION));
+        assertEquals(0, this.student.getSessions().size());
+        assertTrue(this.student.getCurrentSession().isEmpty());
+
+        this.student.addSession(session1);
+        assertEquals(session1, this.student.getCurrentSession());
     }
 
     @Test
     void testRemoveSession() {
-        assertEquals(2, this.student.getSessions().size());
-        assertEquals(new Session(), this.student.getCurrentSession());
+        Session session3 = new Session(2020, SessionType.WINTER_SESSION, winterCourses);
+        this.student.addSession(session3);
+
+        assertEquals(3, this.student.getSessions().size());
         this.student.setCurrentSession(session1);
         assertEquals(session1, this.student.getCurrentSession());
 
         student.removeSession(session1);
+        assertEquals(2, this.student.getSessions().size());
+        assertEquals(session3, this.student.getCurrentSession());
+
+        student.removeSession(session3);
         assertEquals(1, this.student.getSessions().size());
         assertEquals(session2, this.student.getCurrentSession());
 
