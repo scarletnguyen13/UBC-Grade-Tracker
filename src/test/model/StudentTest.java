@@ -153,11 +153,11 @@ class StudentTest {
         assertEquals(2, this.student.getSessions().size());
         assertEquals(session3, this.student.getCurrentSession());
 
-        student.removeSession(session3);
-        assertEquals(1, this.student.getSessions().size());
-        assertEquals(session2, this.student.getCurrentSession());
-
         student.removeSession(session2);
+        assertEquals(1, this.student.getSessions().size());
+        assertEquals(session3, this.student.getCurrentSession());
+
+        student.removeSession(session3);
         assertEquals(0, this.student.getSessions().size());
         assertEquals(new Session(), this.student.getCurrentSession());
     }
