@@ -106,6 +106,11 @@ public class Student extends Person {
         return courses;
     }
 
+    // EFFECTS: returns all the courses the student is taking at the moment
+    public Set<Course> getCurrentSessionCourses() {
+        return this.currentSession.getCourseTermPair().keySet();
+    }
+
     // EFFECTS: returns the session with given year and type, if not found creates and returns a new session
     public Session findSession(int year, SessionType type) {
         Session session = new Session(year, type);

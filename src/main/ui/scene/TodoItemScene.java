@@ -75,7 +75,8 @@ public class TodoItemScene extends MyScene {
 
     private void initCourseComboBox(Course course) {
         courseComboBox = new ComboBox<Course>();
-        ObservableList<Course> courses = FXCollections.observableArrayList(this.student.getAllCourses());
+        ObservableList<Course> courses =
+                FXCollections.observableArrayList(this.student.getCurrentSessionCourses());
         courseComboBox.setItems(courses);
         courseComboBox.setPromptText("Course");
         courseComboBox.setValue(course);

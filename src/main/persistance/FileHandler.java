@@ -8,7 +8,8 @@ import java.io.*;
  * Handle reading and writing storage files
  */
 public class FileHandler {
-    private static final String FILE_PATH = "./data/student.txt";
+    private static final String FILE_PATH =
+            "/Users/scarletnguyen/UBC/First Year/Term 2/CPSC 210/project_d6x2b/data/student.txt";
     private String path;
 
     public FileHandler(String path) {

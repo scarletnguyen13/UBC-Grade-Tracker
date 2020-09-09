@@ -1,5 +1,7 @@
 package ui.scene;
 
+import com.sun.xml.internal.bind.v2.TODO;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -232,7 +234,18 @@ public class DashboardScene extends MyScene {
         initTodoTableProps(tableView);
 
         tableView.setRowFactory(tv -> {
-            TableRow<TodoItem> row = new TableRow<>();
+            TableRow<TodoItem> row = new TableRow<TodoItem>() {
+                @Override
+                public void updateItem(TodoItem item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setStyle("");
+                    } else {
+                        String color = item.isCompleted() ? "lightgreen" : "lightcoral";
+                        setStyle("-fx-background-color: " + color + ";");
+                    }
+                }
+            };
 
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
